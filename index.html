@@ -361,17 +361,59 @@ window.addEventListener('hashchange', navigate);
 /*** Hotels store + persistence ***/
 const store={};
 const PERSIST_KEY='carpediem_state_v2';
-function saveState(){
-  const payload={store,currentOp,hotelsVisible,windowStartISO: windowStart ? new Date(windowStart).toISOString() : null,globalTransfers};
-  try{ localStorage.setItem(PERSIST_KEY, JSON.stringify(payload)); }catch(e){ console.warn('Save failed', e); }
-}
-function loadState(){
-  try{ const raw=localStorage.getItem(PERSIST_KEY); if(!raw) return; const data=JSON.parse(raw);
-    if(data.currentOp) currentOp=data.currentOp; if(typeof data.hotelsVisible==='boolean') setHotelsVisible(data.hotelsVisible); if(data.store && typeof data.store==='object'){ Object.assign(store,data.store); }
-    if(data.windowStartISO){ const d=new Date(data.windowStartISO); if(!isNaN(+d)) { windowStart=d; }}
-    if(Array.isArray(data.globalTransfers)) globalTransfers=data.globalTransfers.map(it=>{ const c=Object.assign({},it); if(c.date && !(c.date instanceof Date)){ const d=new Date(c.date); if(!isNaN(+d)) c.date=d;} return c;});
-  }catch(e){ console.warn('Load failed', e); }
-}
+<script>
+  // --- Firestore LIVE SYNCHRONIZATION ---
+
+  // Έχουμε ήδη το db από το Βήμα 2
+  const STATE_DOC = "main"; // μοναδικό έγγραφο
+
+  // 👉 Αποθήκευση στο cloud
+  async function saveState() {
+    const payload = {
+      store,
+      currentOp,
+      hotelsVisible,
+      windowStartISO: windowStart ? new Date(windowStart).toISOString() : null,
+      globalTransfers
+    };
+    try {
+      await db.collection("state").doc(STATE_DOC).set(payload);
+      console.log("☁️ Αποθηκεύτηκε στο cloud!");
+    } catch (e) {
+      console.warn("Αποτυχία αποθήκευσης", e);
+    }
+  }
+
+  // 👉 Ανάγνωση μία φορά στην εκκίνηση
+  async function loadState() {
+    try {
+      const snap = await db.collection("state").doc(STATE_DOC).get();
+      if (!snap.exists) return;
+      const data = snap.data();
+      Object.assign(store, data.store || {});
+      currentOp = data.currentOp || currentOp;
+      hotelsVisible = !!data.hotelsVisible;
+      if (data.windowStartISO) windowStart = new Date(data.windowStartISO);
+      globalTransfers = Array.isArray(data.globalTransfers) ? data.globalTransfers : [];
+      renderHotelsFor(currentOp);
+      console.log("☁️ Φορτώθηκε από cloud!");
+    } catch (e) {
+      console.warn("Αποτυχία φόρτωσης", e);
+    }
+  }
+
+  // 👉 Real-time ενημέρωση (όταν άλλος χρήστης αλλάξει δεδομένα)
+  db.collection("state").doc(STATE_DOC).onSnapshot((snap) => {
+    if (!snap.exists) return;
+    const data = snap.data();
+    Object.assign(store, data.store || {});
+    currentOp = data.currentOp || currentOp;
+    hotelsVisible = !!data.hotelsVisible;
+    globalTransfers = Array.isArray(data.globalTransfers) ? data.globalTransfers : [];
+    renderHotelsFor(currentOp);
+    console.log("🔄 Live ενημέρωση από Firestore!");
+  });
+</script>
 
 /*** Hotels table DOM ***/
 const theadRow=document.getElementById('theadRow');
