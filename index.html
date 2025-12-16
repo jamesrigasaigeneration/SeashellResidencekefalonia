@@ -317,36 +317,25 @@
   </div>
 </div>
 
-
-<!-- 🔥 Firebase σύνδεση (πρέπει να φορτώσει ΠΡΙΝ τον κύριο κώδικα) -->
-<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore-compat.js"></script>
+<!-- Firebase (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-  // 1) Firebase init (μόνο init εδώ – το real-time sync στήνεται μέσα στον κύριο κώδικα)
+  // Firebase config (μία φορά)
   const firebaseConfig = {
-    apiKey: "AIzaSyC5IUylaLkimi4uWLN4-y0ufri06EYBBMg",
+    apiKey: "AIzaSyC5IUyUalKimi4uWLN4-y0ufri06EYBBMg",
     authDomain: "carpe-diem-transfers.firebaseapp.com",
     projectId: "carpe-diem-transfers",
-    storageBucket: "carpe-diem-transfers.appspot.com",
+    storageBucket: "carpe-diem-transfers.firebasestorage.app",
     messagingSenderId: "273090430362",
     appId: "1:273090430362:web:c47922ba05af78a1c12623",
-    measurementId: "G-WEZ30SXMHW"
+    measurementId: "G-WEZ30SXMWY"
   };
-
-  try{
-    if (!firebase.apps || !firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-    window.db = firebase.firestore();
-  window.__CD_HYDRATED = false;
-    window.STATE_DOC = window.STATE_DOC || "main";
-    console.log("✅ Firebase έτοιμο (db ok).");
-  }catch(e){
-    console.warn("❌ Firebase init απέτυχε:", e);
-    window.db = null;
-  }
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  window.db = firebase.firestore();
+  window.STATE_DOC = "main";
+  console.log("✅ Firebase έτοιμο (db ok).");
 </script>
-
 
 <script>
 /*** Routing ***/
@@ -385,150 +374,79 @@ function navigate(){
 }
   if(route==='tours'){ titleEl.textContent='Tours'; setHotelsVisible(false); showOnly('viewTours'); return; }
   if(!(route in operatorNames)){ location.hash='#/sunweb'; return; }
-  currentOp=route; titleEl.textContent=operatorNames[route];
-  // μην κρύβεις τα Hotels όταν αλλάζεις operator — το κουμπί Hotels το ελέγχει
-  viewTransfers.classList.add('hidden');
-  viewTours.classList.add('hidden');
-  viewHotels.classList.toggle('hidden', !hotelsVisible);
-  if(hotelsVisible){ try{ resetHotelsTableIfEmpty(currentOp); renderHotelsFor(currentOp);}catch(_){}}
-  saveState();
+  currentOp=route; titleEl.textContent=operatorNames[route]; saveState(); setHotelsVisible(false); viewTransfers.classList.add('hidden'); viewTours.classList.add('hidden');
 }
 window.addEventListener('hashchange', navigate);
   
 /*** Hotels store + persistence ***/
 const store={};
-window.STATE_DOC = window.STATE_DOC || 'main';
+const PERSIST_KEY='carpediem_state_v2';
+  
+const debounce = (fn, ms=400) => {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+};
 
-let __applyingRemote = false;
+function safeParseJSON(s, fallback) {
+  try { return JSON.parse(s); } catch { return fallback; }
+}
 
-// 🔄 Real-time sync από Firestore: ό,τι αλλάζει σε άλλον browser ενημερώνει αυτόματα εδώ
-(function setupRealtimeSync(){
-  const dbRef = window.db;
-  const docId = window.STATE_DOC || 'main';
-  if(!dbRef) return;
+function applyStatePayload(data){
+  if(!data) return;
 
-  dbRef.collection('state').doc(docId).onSnapshot((snap)=>{
-    if(!snap.exists) return;
-    const data = snap.data() || {};
+  // store / transfers (as JSON strings to avoid Firestore nested arrays limitation)
+  const nextStore = safeParseJSON(data.storeJSON || "{}", {});
+  const nextTransfers = safeParseJSON(data.globalTransfersJSON || "[]", []);
 
-    __applyingRemote = true;
-    // αντικαθιστούμε με το cloud state
-    // (καθαρίζουμε το store αντικείμενο για να κρατήσουμε references σταθερά)
-    for(const k of Object.keys(store)) delete store[k];
-    // Firestore payload uses JSON strings to avoid nested-arrays limitation
-    if (typeof data.storeJSON === 'string' && data.storeJSON.trim()) {
-      try { Object.assign(store, JSON.parse(data.storeJSON)); } catch(e) { console.warn('⚠️ storeJSON parse failed', e); }
-    } else if (data.store && typeof data.store === 'object') {
-      Object.assign(store, data.store);
-    }
+  // replace store content
+  Object.keys(store).forEach(k => delete store[k]);
+  Object.assign(store, nextStore);
 
-    currentOp = data.currentOp || currentOp;
-    hotelsVisible = !!data.hotelsVisible;
-    if (data.windowStartISO) windowStart = new Date(data.windowStartISO);
+  currentOp = data.currentOp || currentOp;
+  hotelsVisible = !!data.hotelsVisible;
 
-    if (typeof data.globalTransfersJSON === 'string' && data.globalTransfersJSON.trim()) {
-      try { globalTransfers = JSON.parse(data.globalTransfersJSON) || []; } catch(e) { console.warn('⚠️ globalTransfersJSON parse failed', e); globalTransfers = []; }
-    } else {
-      globalTransfers = Array.isArray(data.globalTransfers) ? data.globalTransfers : [];
-    }
+  if (data.windowStartISO) {
+    const d = new Date(data.windowStartISO);
+    if (!isNaN(d.getTime())) windowStart = d;
+  }
+  globalTransfers = Array.isArray(nextTransfers) ? nextTransfers : [];
 
-    // refresh UI ανάλογα με route
-    navigate();
-    if(hotelsVisible) { try{ renderHotelsFor(currentOp); }catch(_){} }
-    try{ renderTransfersWindow(); }catch(_){}
-
-    __applyingRemote = false;
-  });
-})();
-
-  // --- Firestore LIVE SYNCHRONIZATION ---
+  // rerender depending on view
+  try {
+    if (location.hash.includes('transfers')) renderTransfersWindow();
+    else if (hotelsVisible) { resetHotelsTableIfEmpty(currentOp); renderHotelsFor(currentOp); }
+  } catch(_){}
+}
+// --- Firestore LIVE SYNCHRONIZATION ---
 
   // Έχουμε ήδη το db από το Βήμα 2
  
   // 👉 Αποθήκευση στο cloud
   async function saveState() {
-  if (typeof __applyingRemote !== 'undefined' && __applyingRemote) return;
-  // Cloud-only: δεν αποθηκεύουμε τίποτα τοπικά
-  const dbRef = window.db;
-  const docId = window.STATE_DOC || 'main';
-  if (!dbRef) {
-    console.warn('⚠️ Δεν υπάρχει σύνδεση Firestore (window.db). Οι αλλαγές ΔΕΝ θα σωθούν.');
-    return;
-  }
-
   const payload = {
-    // Firestore δεν επιτρέπει nested arrays, άρα στέλνουμε JSON strings
+    v: 3,
+    updatedAt: Date.now(),
     storeJSON: JSON.stringify(store),
-    globalTransfersJSON: JSON.stringify(globalTransfers),
     currentOp,
     hotelsVisible,
     windowStartISO: windowStart ? new Date(windowStart).toISOString() : null,
-    updatedAt: new Date().toISOString(),
+    globalTransfersJSON: JSON.stringify(globalTransfers)
   };
 
+  // 1) Τοπικά (γρήγορο + offline)
+  try { localStorage.setItem(PERSIST_KEY, JSON.stringify(payload)); } catch (_) {}
+
+  // 2) Cloud (Firestore)
   try {
-    await dbRef.collection('state').doc(docId).set(payload);
-    // console.log('☁️ Saved to Firestore');
+    if (window.db) {
+      await db.collection("state").doc(window.STATE_DOC || "main").set(payload, { merge: true });
+      // console.log("☁️ Αποθηκεύτηκε στο cloud!");
+    }
   } catch (e) {
-    console.warn('❌ Αποτυχία αποθήκευσης στο Firestore', e);
+    console.warn("Αποτυχία αποθήκευσης στο Firestore", e);
   }
 }
 
-// 👉 Ανάγνωση στην εκκίνηση (cloud-only)
-async function loadState() {
-  const dbRef = window.db;
-  const docId = window.STATE_DOC || 'main';
-  if (!dbRef) {
-    console.warn('⚠️ Δεν υπάρχει Firestore db – δεν μπορώ να φορτώσω state.');
-    return;
-  }
-  try {
-    const snap = await dbRef.collection('state').doc(docId).get();
-    if (!snap.exists) return;
-    const data = snap.data() || {};
-    Object.assign(store, data.store || {});
-    currentOp = data.currentOp || currentOp;
-    hotelsVisible = !!data.hotelsVisible;
-    if (data.windowStartISO) windowStart = new Date(data.windowStartISO);
-    globalTransfers = Array.isArray(data.globalTransfers) ? data.globalTransfers : [];
-    // Δεν καλούμε setHotelsVisible εδώ για να μην ξαναγράψουμε state αμέσως
-    renderHotelsFor(currentOp);
-  } catch (e) {
-    console.warn('❌ Αποτυχία φόρτωσης από Firestore', e);
-  }
-}
-
-</script>
-
-<script>
-/*** Hotels table DOM ***/
-const theadRow=document.getElementById('theadRow');
-const tbody=document.getElementById('tbodyRows');
-const statusEl=document.getElementById('status');
-const searchInput=document.getElementById('hotelSearch');
-const filePicker=document.getElementById('filePicker');
-const syncBtn=document.getElementById('syncExcelBtn');
-const downloadExcelBtn=document.getElementById('downloadExcelBtn');
-const addRowBtn=document.getElementById('addRowBtn');
-const deleteRowsBtn=document.getElementById('deleteRowsBtn');
-const addColBtn=document.getElementById('addColBtn');
-const deleteColBtn=document.getElementById('deleteColBtn');
-
-function lazyLoadXLSX(cb){ if(window.XLSX) return cb(); const s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'; s.onload=cb; s.onerror=()=>alert('Αποτυχία φόρτωσης XLSX'); document.head.appendChild(s); }
-function detectAccommodationKey(hs){ const candidates=['accommodation','όνομα','όνομα ξενοδοχείου','hotel','hotel name','όνομα καταλύματος']; let idx=-1; hs.forEach((h,i)=>{ const k=String(h).trim().toLowerCase(); if(idx===-1 && (candidates.includes(k) || /accom|ξενοδ|hotel/.test(k))) idx=i; }); return idx; }
-function detectEmailKey(hs){ const candidates=['email','e-mail','mail']; let idx=-1; hs.forEach((h,i)=>{ const k=String(h).trim().toLowerCase(); if(idx===-1 && (candidates.includes(k) || /mail/.test(k))) idx=i; }); return idx; }
-function detectPhoneKey(hs){ const candidates=['τηλέφωνο','phone','telephone','tel']; let idx=-1; hs.forEach((h,i)=>{ const k=String(h).trim().toLowerCase(); if(idx===-1 && (candidates.includes(k) || /tel|phone|τηλεφ/.test(k))) idx=i; }); return idx; }
-function detectSiteKey(hs){ const candidates=['website','site','url']; let idx=-1; hs.forEach((h,i)=>{ const k=String(h).trim().toLowerCase(); if(idx===-1 && (candidates.includes(k) || /site|url|web/.test(k))) idx=i; }); return idx; }
-
-function ensurePack(op){ if(!store[op]) store[op]={headers:[],rows:[],accIdx:-1,emailIdx:-1,phoneIdx:-1,siteIdx:-1}; return store[op]; }
-function resetHotelsTableIfEmpty(op){ const pack=store[op]; if(!pack){ theadRow.innerHTML=''; tbody.innerHTML=''; statusEl.textContent='0 γραμμές · 0 στήλες'; searchInput.value=''; }}
-
-function cellToNode(val){
-  const td=document.createElement('td'); td.contentEditable='true';
-  if(typeof val==='string' && (/^https?:\/\//i.test(val) || /www\.[^\s]+/i.test(val))){
-    td.textContent=val; return td;
-  } else { td.textContent=val??''; return td; }
-}
 
 function renderHotelsFor(op){
   const pack=ensurePack(op);
@@ -613,9 +531,8 @@ headers.forEach((h,i)=>{
           saveState();
         });
       } else {
+        td.addEventListener('input', onCellEditDebounced);
         td.addEventListener('blur', onCellEdit);
-        td.addEventListener('input', onCellInput);
-        td.addEventListener('keydown', preventEnter);
       }
 
       tr.appendChild(td);
@@ -627,26 +544,8 @@ headers.forEach((h,i)=>{
   statusEl.textContent=`${rows.length||0} γραμμές · ${headers.length||0} στήλες`+(pack.accIdx===-1 && rows.length?' (Δεν βρέθηκε στήλη Accommodation)':'');
 }
 
-// Αποθήκευση κελιού: σε blur (όταν φεύγεις από το κελί) ΚΑΙ σε input (καθώς γράφεις, με debounce)
-let __cellSaveT = null;
-function commitCell(td){
-  const r=+td.dataset.row, c=+td.dataset.col;
-  const pack=ensurePack(currentOp);
-  pack.rows[r][c]=(td.textContent||'').trim();
-  saveState();
-}
-function onCellEdit(e){
-  const td=e.currentTarget;
-  commitCell(td);
-}
-function onCellInput(e){
-  const td=e.currentTarget;
-  if(__cellSaveT) clearTimeout(__cellSaveT);
-  __cellSaveT = setTimeout(()=> commitCell(td), 400); // autosave ~0.4s μετά την τελευταία πληκτρολόγηση
-}
-function preventEnter(e){
-  if(e.key==='Enter'){ e.preventDefault(); e.currentTarget.blur(); }
-}
+function onCellEdit(e){ const td=e.currentTarget; const r=+td.dataset.row, c=+td.dataset.col; const pack=ensurePack(currentOp); pack.rows[r][c]=td.textContent.trim(); saveState(); }
+const onCellEditDebounced = debounce(onCellEdit, 400);
 
 function performHotelSearch(){
   const pack=store[currentOp]; if(!pack) return;
@@ -1047,7 +946,6 @@ chip.innerHTML = `${opHtml}${nameHtml}<div class='tf-row'>${paxHtml}${metaHtml}<
 })();
 
 // Boot
-window.addEventListener('beforeunload', ()=>{ try{ saveState(); }catch(_){} });
 loadState(); if(!location.hash) location.hash = '#/' + currentOp; if (Array.isArray(globalTransfers) && globalTransfers.length) { try { renderTransfersWindow(); } catch(e) { console.warn(e); } } navigate();
 
 // Open read-only modal on double-click for Private Transfers
@@ -1200,7 +1098,6 @@ document.addEventListener('dblclick', (ev)=>{
     </div>
   </div>
 </div>
-</script>
 
 <script>
 (function(){
@@ -1423,5 +1320,6 @@ function populateOperatorFilter(){
   });
 })();
 </script>
+
 </body>
 </html>
