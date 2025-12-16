@@ -1,0 +1,1377 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Carpe Diem — Operators / Hotels / Transfers</title>
+<!-- OFFLINE: no external fonts, use system stacks -->
+<style>
+  :root{
+    --bg:#0b1220;
+    --bg-grad: radial-gradient(1200px 600px at 20% -10%, #1b2a55 0%, transparent 60%),
+               radial-gradient(1000px 600px at 120% 20%, #1d3b56 0%, transparent 60%),
+               linear-gradient(180deg, #0b1220 0%, #0a1020 100%);
+    --glass: rgba(255,255,255,.06);
+    --glass-2: rgba(255,255,255,.08);
+    --ink:#e6edf7;
+    --muted:#9fb0c7;
+    --border: rgba(255,255,255,.12);
+    --accent:#5ea0ff;
+    --arr:#22c55e; --dep:#f97316;
+    --radius:16px; --shadow-lg: 0 20px 50px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.3); --shadow-md: 0 10px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg-grad);}  
+  .hidden{display:none}
+  .app{display:grid;grid-template-columns:300px 1fr;min-height:100vh;gap:22px;padding:22px}
+  @media(max-width:1100px){ .app{grid-template-columns: 96px 1fr} .brand .text{display:none} .nav .label{display:none} .nav a{justify-content:center} }
+  @media(max-width:720px){ .app{grid-template-columns:1fr} .sidebar{position:sticky;top:0;z-index:20} }
+  .sidebar{backdrop-filter: blur(10px); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border:1px solid var(--border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-md); display:flex; flex-direction:column; gap:14px}
+  .brand{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--glass);border:1px solid var(--border)}
+  .brand svg{width:26px;height:26px;stroke:var(--accent)}
+  .brand .text{font-weight:800;letter-spacing:.3px}
+  .nav{display:flex;flex-direction:column;gap:6px}
+  .group{margin:6px 10px 2px;color:var(--muted);font-size:11px;letter-spacing:.4px;text-transform:uppercase}
+  .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;color:var(--ink);text-decoration:none;border:1px solid transparent;transition:all .18s ease;background:transparent}
+  .nav a:hover{background:var(--glass-2);border-color:var(--border)}
+  .nav a.active{background:linear-gradient(180deg, rgba(94,160,255,.2), rgba(94,160,255,.12)); border-color: rgba(94,160,255,.35)}
+  .nav .icon{width:18px;height:18px;opacity:.9}
+  .main{display:flex;flex-direction:column;gap:14px}
+  .header{display:flex;align-items:center;gap:12px}
+  .title{font-size:22px;font-weight:800;letter-spacing:.2px;margin-right:6px}
+  .btn{appearance:none;border:1px solid var(--border);background:var(--glass);color:var(--ink);padding:9px 12px;border-radius:10px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{background:var(--glass-2)}
+  .btn.primary{background:linear-gradient(180deg, rgba(94,160,255,.25), rgba(94,160,255,.12)); border-color: rgba(94,160,255,.45)}
+  .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:0;flex-wrap:wrap}
+  .search{flex:1;min-width:280px;display:flex;gap:8px;align-items:center;background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+  .search input{flex:1;background:transparent;border:0;outline:none;color:var(--ink);font-size:14px}
+  .panel{border:1px solid var(--border);background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));border-radius:var(--radius);box-shadow:var(--shadow-lg);overflow:hidden}
+  .table-wrap{width:100%;overflow:auto}
+  table{width:max(100%,1200px);border-collapse:separate;border-spacing:0}
+  thead th{
+  }
+  table th:first-child, table td:first-child{ width:64px; text-align:right; } /* numbering column */
+  thead th{position:sticky;top:0;background:linear-gradient(180deg, rgba(30,41,72,.95), rgba(25,34,60,.95));border-bottom:1px solid var(--border);padding:8px 10px;text-align:left;font-size:12px;font-weight:700;letter-spacing:.2px;backdrop-filter:blur(4px)}
+  tbody td{padding:8px 10px;border-bottom:1px solid var(--border);white-space:nowrap;font-size:13px}
+  tbody tr:nth-child(odd){background:rgba(255,255,255,.02)}
+  tbody tr:nth-child(even){background:rgba(255,255,255,.04)}
+  tbody tr:hover{background:rgba(94,160,255,.08)}
+  tr.selected{outline:2px solid rgba(94,160,255,.5); background:rgba(94,160,255,.12)!important}
+  td[contenteditable="true"]{outline:1px dashed rgba(255,255,255,.15)}
+  a.link{color:#9fd1ff;text-decoration:underline}
+  .controls{display:flex;gap:12px;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap}
+  .controls .field{display:flex;flex-direction:column;gap:4px}
+  .controls input[type="date"]{background:var(--glass);color:var(--ink);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+  .timeline{border:1px solid var(--border);border-radius:var(--radius);overflow:auto;background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));box-shadow:var(--shadow-lg)}
+  .grid-tl{display:grid;grid-template-columns:360px repeat(30,220px);min-width:fit-content}
+  .hcell{position:sticky;top:0;background:linear-gradient(180deg, rgba(30,41,72,.95), rgba(25,34,60,.95));border-bottom:1px solid var(--border);padding:8px;text-align:center;font-weight:700;backdrop-filter:blur(4px)}
+  .section{grid-column:1 / -1;background:rgba(255,255,255,.04);border-bottom:1px solid var(--border);padding:12px 16px;font-weight:800}
+  .rlabel{position:sticky;left:0;background:linear-gradient(180deg, rgba(30,41,72,.95), rgba(25,34,60,.95));border-right:1px solid var(--border);padding:8px;font-weight:700;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(4px)}
+  .rlabel.arr{color:var(--arr)} .rlabel.dep{color:var(--dep)}
+  .cell{border-left:1px solid var(--border);border-bottom:1px solid var(--border);min-height:80px;padding:6px}
+  .chip{display:inline-block;background:rgba(94,160,255,.12);border:1px solid rgba(94,160,255,.45);color:#dbeafe;padding:6px 12px;border-radius:999px;font-size:13px;margin:6px 6px 0 0}
+  .footer-tools{position:sticky;bottom:0;display:flex;gap:8px;align-items:center;padding:10px;border-top:1px solid var(--border);background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+  .modal.show{display:flex}
+  .card{width:min(960px,95vw);border:1px solid var(--border);border-radius:20px;background:linear-gradient(180deg, rgba(18,25,45,.96), rgba(14,20,36,.96));box-shadow:var(--shadow-lg);}
+  .card header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+  .card h3{margin:0;font-size:18px}
+  .card .content{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .label{font-size:12px;color:var(--muted)}
+  .input{width:100%;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--ink)}
+  .mini-table{width:100%;border-collapse:separate;border-spacing:0;margin-top:6px}
+  .mini-table th,.mini-table td{border-bottom:1px solid var(--border);padding:8px 10px;text-align:left}
+  .mini-table th{font-size:12px}
+  .mini-table td{font-size:13px}
+  .pill{display:inline-flex;gap:8px;align-items:center}
+  .splash{position:fixed; inset:0; z-index:9999; display:grid; place-items:center; background:var(--bg-grad); transition:opacity 1s ease, filter 1s ease;}
+  .splash.hidden{ opacity:0; pointer-events:none; filter:blur(10px); }
+  .logoWrap{display:flex; gap:min(3vw,18px); align-items:baseline; justify-content:center; perspective:1000px;}
+  .word{font-weight:900; font-size:clamp(48px, 9vw, 128px); text-transform:uppercase; letter-spacing:.06em; line-height:1; white-space:nowrap; position:relative; background:linear-gradient(170deg,#ffffff 0%,#dfe2e6 40%,#b9bec3 65%,#f1f3f5 100%); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:0 1px 0 #b9bfc6, 0 2px 0 #a7adb4, 0 4px 6px rgba(0,0,0,.35);}
+  .char{display:inline-block;opacity:0;transform:translateY(20px) rotateX(30deg) scale(.96);filter:blur(4px);animation: letterIn 1s cubic-bezier(.2,.8,.2,1) var(--delay) forwards;}
+  @keyframes letterIn{0%{opacity:0;transform:translateY(20px) rotateX(30deg) scale(.96);filter:blur(4px);}70%{opacity:1;transform:translateY(0) rotateX(0) scale(1.02);filter:blur(0);}100%{opacity:1;transform:translateY(0) rotateX(0) scale(1);filter:blur(0);}}
+
+/* --- Transfer capsule redesign (compact + squared corners) --- */
+.chip{
+  display:flex; flex-direction:column; align-items:flex-start; gap:6px;
+  padding:10px 12px; border-radius:12px;
+  border:1px solid rgba(94,160,255,.35);
+  background:rgba(94,160,255,.10);
+}
+.chip .tf-op{font-size:11px; font-weight:800; margin-bottom:2px;}
+.chip .tf-name{font-size:13px; font-weight:800; line-height:1.15}
+.chip .tf-row{display:flex; align-items:center; gap:10px}
+.chip .tf-pax{display:inline-grid; place-items:center; min-width:22px; height:22px; padding:0 6px;
+  border-radius:999px; border:1px solid rgba(255,255,255,.6); font-size:12px; font-weight:800}
+.chip .tf-meta{display:flex; flex-direction:column; line-height:1.1}
+.chip .tf-time{font-size:12px; font-weight:800; opacity:.95}
+.chip .tf-flight{font-size:11px; opacity:.9}
+
+
+/* --- Private Transfer badge + read-only modal --- */
+.chip{ position: relative; }
+.chip .tf-private {
+  position:absolute; top:6px; right:6px;
+  font-size:10px; padding:2px 6px; border-radius:999px;
+  border:1px solid rgba(255,255,255,.45);
+  background:rgba(255,255,255,.12);
+  text-transform:uppercase; letter-spacing:.3px;
+}
+.cd-modal {
+  position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.5); z-index:9999;
+}
+.cd-modal .card {
+  background:#0f1728; border:1px solid rgba(255,255,255,.2); border-radius:14px; padding:18px 20px; min-width:360px; max-width:520px;
+  box-shadow:0 10px 40px rgba(0,0,0,.5);
+}
+.cd-modal header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.cd-modal header h3 { margin:0; font-size:16px; }
+.cd-modal .close { cursor:pointer; border:1px solid rgba(255,255,255,.25); border-radius:8px; padding:4px 8px; }
+.cd-modal .muted { opacity:.8; font-size:12px; }
+.cd-modal ul { margin:8px 0 0; padding-left:18px; }
+
+
+/* --- Danger (clear) button + PIN modal --- */
+.btn.danger{ background:#7f1d1d; border:1px solid rgba(255,255,255,.25); }
+.btn.danger:hover{ background:#991b1b; }
+#pinModal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.55); z-index:9999; }
+#pinModal .card{ background:#0f1728; border:1px solid rgba(255,255,255,.2); border-radius:14px; padding:18px 20px; min-width:320px; box-shadow:0 10px 40px rgba(0,0,0,.5); }
+#pinModal header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+#pinModal h3{ margin:0; font-size:16px; }
+#pinModal .row{ display:flex; gap:8px; align-items:center; }
+#pinModal input[type=password]{ width:100%; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,.2); background:#0b1220; color:#fff; }
+#pinModal .actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+#pinError{ color:#fca5a5; font-size:12px; min-height:16px; }
+
+
+/* Topbar above Transfers timeline */
+.transfers-topbar{ display:flex; justify-content:flex-end; gap:8px; margin:8px 0 10px; }
+
+
+/* Align filter select inline in the top controls bar */
+.select{ background:#0b1220; border:1px solid rgba(255,255,255,.2); color:#fff; border-radius:8px; padding:6px 8px; }
+
+</style>
+</head>
+<body class="splash-active">
+<div class="splash" id="splash"><div class="logoWrap" id="logoWrap"></div></div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6c-2-2-10-2-10 2s10 0 10 4-8 4-10 2"/></svg>
+      <span class="text">Carpe Diem</span>
+    </div>
+    <nav class="nav">
+      <div class="group">Tour Operators</div>
+      <a href="#/sunweb" class="active"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/></svg><span class="label">Sunweb</span></a>
+      <a href="#/blue"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="5" width="14" height="14" rx="3"/></svg><span class="label">Blue Style</span></a>
+      <a href="#/grecos"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12h16M4 7h16M4 17h16"/></svg><span class="label">Grecos</span></a>
+      <a href="#/palma"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v20M5 8l14 8M19 8L5 16"/></svg><span class="label">Palma</span></a>
+      <a href="#/satur"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12h18M12 3v18"/></svg><span class="label">Satur</span></a>
+
+<a href="#/eliza">
+  <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+    <circle cx="12" cy="12" r="8"/>
+  </svg>
+  <span class="label">Eliza</span>
+</a>
+
+      <div class="group">Modules</div>
+      <a href="#/transfers"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12h16M10 7l-5 5 5 5"/></svg><span class="label">Transfers</span></a>
+      <a href="#/tours"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h18M7 7v10m10-10v10M3 17h18"/></svg><span class="label">Tours</span></a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="header">
+      <div class="title" id="pageTitle">Sunweb</div>
+      <button class="btn primary" id="toggleHotelsBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="3"/><path d="M7 8h10M7 12h6"/></svg>
+        Hotels
+      </button>
+    </div>
+
+    <!-- Hotels -->
+    <section id="viewHotels" class="hidden">
+      <div class="toolbar panel" style="padding:12px 14px">
+        <div class="search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a9b8cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="hotelSearch" placeholder="Αναζήτηση Accommodation — ακριβής αντιστοίχιση" autocomplete="off">
+        </div>
+        <button class="btn primary" id="syncExcelBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 3v6h6"/></svg>
+          Συγχρονισμός Excel
+        </button>
+        <input type="file" id="filePicker" accept=".xlsx,.csv" class="hidden">
+        <button class="btn" id="downloadExcelBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Λήψη Excel
+        </button>
+        <span class="spacer"></span>
+        <span class="badge" id="status">0 γραμμές · 0 στήλες</span>
+      </div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table id="hotelTable">
+            <thead><tr id="theadRow"></tr></thead>
+            <tbody id="tbodyRows"></tbody>
+          </table>
+        </div>
+        <div class="footer-tools" id="footerTools">
+          <button class="btn" id="addRowBtn">+ Προσθήκη γραμμής</button>
+          <button class="btn" id="deleteRowsBtn">Διαγραφή επιλεγμένων</button>
+          <button class="btn" id="addColBtn">+ Προσθήκη στήλης</button>
+          <button class="btn" id="deleteColBtn">Διαγραφή τελευταίας στήλης</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Transfers -->
+    <section id="viewTransfers" class="hidden">
+      <div class="panel" style="padding:12px 14px">
+        <div class="controls">
+          <div class="row">
+            <button class="btn" id="prevDay">◀ Προηγούμενη ημέρα</button>
+            <button class="btn" id="todayBtn">Σήμερα</button>
+            <button class="btn" id="nextDay">Επόμενη ημέρα ▶</button>
+            <button class="btn danger" id="clearAllTransfersBtn">🗑️ Διαγραφή όλων</button>
+          </div>
+          <div class="field">
+            <label class="subtle" for="jumpDate">Μετάβαση σε ημερομηνία (30ήμερο)</label>
+            <input type="date" id="jumpDate">
+          </div>
+          <button class="btn primary" id="jumpBtn">Μετάβαση</button>
+          <span class="spacer"></span>
+          <button class="btn" id="uploadBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M7 9l5-5 5 5"/><path d="M12 4v12"/></svg>
+            Συγχρονισμός αρχείου
+          </button>
+          <input type="file" id="wordpadPicker" accept=".txt,.rtf,.csv" class="hidden">
+          <span class="badge" id="tlStatus">Δεν έχουν εισαχθεί δεδομένα</span>
+        </div>
+      </div>
+      <div class="timeline">
+        <div class="grid-tl" id="tlGrid"></div>
+      </div>
+    </section>
+
+    <!-- Tours placeholder -->
+    <section id="viewTours" class="hidden">
+      <div class="panel" style="padding:18px">
+        <div class="subtle">Module</div>
+        <div style="font-weight:800;font-size:18px;margin-top:4px">Tours</div>
+        <div class="subtle" style="margin-top:6px">Σύντομα…</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Capsule modal -->
+<div class="modal" id="hotelModal" aria-hidden="true">
+  <div class="card">
+    <header>
+      <h3 id="modalTitle">Λεπτομέρειες ξενοδοχείου</h3>
+      <div class="pill">
+        <button class="btn" id="closeModal">Κλείσιμο</button>
+        <button class="btn primary" id="saveModal">Αποθήκευση</button>
+      </div>
+    </header>
+    <div class="content">
+      <div>
+        <label class="label">Όνομα ξενοδοχείου</label>
+        <input class="input" id="mName" placeholder="π.χ. Carpe Diem Hotel">
+      </div>
+      <div>
+        <label class="label">Email</label>
+        <input class="input" id="mEmail" placeholder="info@example.com">
+      </div>
+      <div>
+        <label class="label">Τηλέφωνο</label>
+        <input class="input" id="mPhone" placeholder="+30 …">
+      </div>
+      <div>
+        <label class="label">Website</label>
+        <input class="input" id="mSite" placeholder="https://…">
+      </div>
+      <div style="grid-column:1/-1">
+        <div class="label">Μικρός πίνακας (σταθερές στήλες · απεριόριστες γραμμές)</div>
+        <table class="mini-table" id="miniTable">
+  <thead>
+    <tr>
+      <th>Room types</th>
+      <th>Allocation</th>
+      <th>Min Pax</th>
+      <th>Max Pax</th>
+      <th>Total min beds</th>
+      <th>Total max beds</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+        <button class="btn" id="miniAdd">+ Προσθήκη γραμμής</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/*** Routing ***/
+const titleEl=document.getElementById('pageTitle');
+const viewHotels=document.getElementById('viewHotels');
+const viewTransfers=document.getElementById('viewTransfers');
+const viewTours=document.getElementById('viewTours');
+const toggleHotelsBtn=document.getElementById('toggleHotelsBtn');
+const operatorNames={sunweb:'Sunweb',blue:'Blue Style',grecos:'Grecos',palma:'Palma',satur:'Satur',eliza:'Eliza'};
+let currentOp='sunweb';
+let hotelsVisible=false;
+function setHotelsVisible(v){
+  hotelsVisible=v;
+  viewHotels.classList.toggle('hidden', !v);
+  toggleHotelsBtn.innerHTML = v? '✕ Απόκρυψη'
+    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="3"/><path d="M7 8h10M7 12h6"/></svg> Hotels';
+  if(v){ resetHotelsTableIfEmpty(currentOp); renderHotelsFor(currentOp); }
+  saveState();
+}
+
+toggleHotelsBtn.addEventListener('click', ()=> setHotelsVisible(!hotelsVisible));
+function showOnly(section){ ['viewHotels','viewTransfers','viewTours'].forEach(id=>document.getElementById(id).classList.add('hidden')); document.getElementById(section).classList.remove('hidden'); }
+function parseRoute(){ const m=location.hash.match(/^#\/?([a-z]+)?$/i); return m && m[1] ? m[1] : 'sunweb'; }
+function navigate(){
+  const route=parseRoute();
+  document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
+  const link=document.querySelector('.nav a[href="#/'+route+'"]'); if(link) link.classList.add('active');
+  if(route==='transfers'){
+  titleEl.textContent='Transfers';
+  setHotelsVisible(false);
+  showOnly('viewTransfers');
+  // always start at today
+  windowStart = new Date(); windowStart.setHours(0,0,0,0);
+  try{ renderTransfersWindow(); saveState(); }catch(_){}
+  return;
+}
+  if(route==='tours'){ titleEl.textContent='Tours'; setHotelsVisible(false); showOnly('viewTours'); return; }
+  if(!(route in operatorNames)){ location.hash='#/sunweb'; return; }
+  currentOp=route; titleEl.textContent=operatorNames[route]; saveState(); setHotelsVisible(false); viewTransfers.classList.add('hidden'); viewTours.classList.add('hidden');
+}
+window.addEventListener('hashchange', navigate);
+  
+/*** Hotels store + persistence ***/
+const store={};
+const PERSIST_KEY='carpediem_state_v2';
+window.STATE_DOC = window.STATE_DOC || 'main';
+  // --- Firestore LIVE SYNCHRONIZATION ---
+
+  // Έχουμε ήδη το db από το Βήμα 2
+ 
+  // 👉 Αποθήκευση στο cloud
+  async function saveState() {
+    const payload = {
+      store,
+      currentOp,
+      hotelsVisible,
+      windowStartISO: windowStart ? new Date(windowStart).toISOString() : null,
+      globalTransfers
+    };
+
+    // Fallback: localStorage (δουλεύει offline)
+    try { localStorage.setItem(PERSIST_KEY, JSON.stringify(payload)); } catch(_) {}
+
+    // Cloud save μόνο αν υπάρχει Firestore db
+    const dbRef = window.db;
+    const docId = window.STATE_DOC || 'main';
+    if (!dbRef) return;
+
+    try {
+      await dbRef.collection("state").doc(docId).set(payload);
+      console.log("☁️ Αποθηκεύτηκε στο cloud!");
+    } catch (e) {
+      console.warn("Αποτυχία αποθήκευσης", e);
+    }
+  }
+
+  // 👉 Ανάγνωση μία φορά στην εκκίνηση
+  async function loadState() {
+    const docId = window.STATE_DOC || 'main';
+
+    // 1) Προσπάθησε cloud (αν υπάρχει db)
+    const dbRef = window.db;
+    if (dbRef) {
+      try {
+        const snap = await dbRef.collection("state").doc(docId).get();
+        if (snap.exists) {
+          const data = snap.data() || {};
+          Object.assign(store, data.store || {});
+          currentOp = data.currentOp || currentOp;
+          hotelsVisible = !!data.hotelsVisible;
+          if (data.windowStartISO) windowStart = new Date(data.windowStartISO);
+          globalTransfers = Array.isArray(data.globalTransfers) ? data.globalTransfers : [];
+          renderHotelsFor(currentOp);
+          console.log("☁️ Φορτώθηκε από cloud!");
+          return;
+        }
+      } catch (e) {
+        console.warn("Αποτυχία φόρτωσης από cloud", e);
+      }
+    }
+
+    // 2) Fallback localStorage
+    try {
+      const raw = localStorage.getItem(PERSIST_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      Object.assign(store, data.store || {});
+      currentOp = data.currentOp || currentOp;
+      hotelsVisible = !!data.hotelsVisible;
+      if (data.windowStartISO) windowStart = new Date(data.windowStartISO);
+      globalTransfers = Array.isArray(data.globalTransfers) ? data.globalTransfers : [];
+      renderHotelsFor(currentOp);
+      console.log("💾 Φορτώθηκε από localStorage!");
+    } catch (e) {
+      console.warn("Αποτυχία φόρτωσης από localStorage", e);
+    }
+  }
+
+</script>
+
+<script>
+/*** Hotels table DOM ***/
+const theadRow=document.getElementById('theadRow');
+const tbody=document.getElementById('tbodyRows');
+const statusEl=document.getElementById('status');
+const searchInput=document.getElementById('hotelSearch');
+const filePicker=document.getElementById('filePicker');
+const syncBtn=document.getElementById('syncExcelBtn');
+const downloadExcelBtn=document.getElementById('downloadExcelBtn');
+const addRowBtn=document.getElementById('addRowBtn');
+const deleteRowsBtn=document.getElementById('deleteRowsBtn');
+const addColBtn=document.getElementById('addColBtn');
+const deleteColBtn=document.getElementById('deleteColBtn');
+
+function lazyLoadXLSX(cb){ if(window.XLSX) return cb(); const s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'; s.onload=cb; s.onerror=()=>alert('Αποτυχία φόρτωσης XLSX'); document.head.appendChild(s); }
+function detectAccommodationKey(hs){ const candidates=['accommodation','όνομα','όνομα ξενοδοχείου','hotel','hotel name','όνομα καταλύματος']; let idx=-1; hs.forEach((h,i)=>{ const k=String(h).trim().toLowerCase(); if(idx===-1 && (candidates.includes(k) || /accom|ξενοδ|hotel/.test(k))) idx=i; }); return idx; }
+function detectEmailKey(hs){ const candidates=['email','e-mail','mail']; let idx=-1; hs.forEach((h,i)=>{ const k=String(h).trim().toLowerCase(); if(idx===-1 && (candidates.includes(k) || /mail/.test(k))) idx=i; }); return idx; }
+function detectPhoneKey(hs){ const candidates=['τηλέφωνο','phone','telephone','tel']; let idx=-1; hs.forEach((h,i)=>{ const k=String(h).trim().toLowerCase(); if(idx===-1 && (candidates.includes(k) || /tel|phone|τηλεφ/.test(k))) idx=i; }); return idx; }
+function detectSiteKey(hs){ const candidates=['website','site','url']; let idx=-1; hs.forEach((h,i)=>{ const k=String(h).trim().toLowerCase(); if(idx===-1 && (candidates.includes(k) || /site|url|web/.test(k))) idx=i; }); return idx; }
+
+function ensurePack(op){ if(!store[op]) store[op]={headers:[],rows:[],accIdx:-1,emailIdx:-1,phoneIdx:-1,siteIdx:-1}; return store[op]; }
+function resetHotelsTableIfEmpty(op){ const pack=store[op]; if(!pack){ theadRow.innerHTML=''; tbody.innerHTML=''; statusEl.textContent='0 γραμμές · 0 στήλες'; searchInput.value=''; }}
+
+function cellToNode(val){
+  const td=document.createElement('td'); td.contentEditable='true';
+  if(typeof val==='string' && (/^https?:\/\//i.test(val) || /www\.[^\s]+/i.test(val))){
+    td.textContent=val; return td;
+  } else { td.textContent=val??''; return td; }
+}
+
+function renderHotelsFor(op){
+  const pack=ensurePack(op);
+  const {headers,rows}=pack;
+
+  // Ensure "Signed" column exists at index 9 (10th)
+  const desiredIdx = 9;
+  const existingIdx = headers.findIndex(h => String(h).trim().toLowerCase() === 'signed'.toLowerCase());
+  if (existingIdx === -1) {
+    headers.splice(desiredIdx, 0, 'Signed');
+    rows.forEach(r => r.splice(desiredIdx, 0, '')); // init empty
+  } else if (existingIdx !== desiredIdx) {
+    // Move header and all row values to index 10
+    const [hdr] = headers.splice(existingIdx, 1);
+    headers.splice(desiredIdx, 0, hdr);
+    rows.forEach(r => {
+      const [val] = r.splice(existingIdx, 1);
+      r.splice(desiredIdx, 0, val);
+    });
+  }
+
+  // Rebuild table with special handling for "Signed" column
+  theadRow.innerHTML='';
+  // Fixed first header: Α/Α (αυτόματη αρίθμηση)
+  (function(){
+    const thIdx = document.createElement('th');
+    thIdx.textContent = 'Α/Α';
+    theadRow.appendChild(thIdx);
+  })();
+  // Μετά τους τίτλους από το Excel στη σειρά που δόθηκαν
+  headers.forEach((h,i)=>{
+    const th=document.createElement('th');
+    th.textContent = h || ('Στήλη ' + (i+1));
+
+    // Make header editable except for the pinned "Signed" column
+    const desiredIdx = 9; // index where "Signed" is pinned
+    const isSignedCol = (i === desiredIdx);
+    if (!isSignedCol) {
+      th.contentEditable = 'true';
+      th.title = 'Κάνε κλικ και άλλαξε τον τίτλο της στήλης';
+      th.addEventListener('blur', ()=>{
+        const pack = ensurePack(currentOp);
+        const newName = (th.textContent || '').trim() || ('Στήλη ' + (i+1));
+        pack.headers[i] = newName;
+
+        // re-detect special columns based on new headers
+        pack.accIdx   = detectAccommodationKey(pack.headers);
+        pack.emailIdx = detectEmailKey(pack.headers);
+        pack.phoneIdx = detectPhoneKey(pack.headers);
+        pack.siteIdx  = detectSiteKey(pack.headers);
+
+        saveState();
+        renderHotelsFor(currentOp); // re-render so pinning & widths take effect
+      });
+    }
+    theadRow.appendChild(th);
+  });
+tbody.innerHTML='';
+  rows.forEach((r,rowIdx)=>{
+    const tr=document.createElement('tr');
+    tr.addEventListener('click',()=> tr.classList.toggle('selected'));
+    tr.addEventListener('dblclick',()=> openHotelModal(rowIdx));
+// Numbering cell (left-most)
+const tdNum=document.createElement('td'); tdNum.contentEditable='false'; tdNum.style.textAlign='right'; tdNum.textContent=String(rowIdx+1);
+tr.appendChild(tdNum);
+
+headers.forEach((h,i)=>{
+      const td = cellToNode(r[i]);
+      td.dataset.row=rowIdx;
+      td.dataset.col=i;
+
+      if (i === desiredIdx) {
+        // "Signed" column: toggle between empty and ✅
+        td.contentEditable='false';
+        td.style.textAlign='center';
+        const current = (r[i]||'').trim() === '✅' ? '✅' : '⬜';
+        td.innerHTML = current;
+        td.addEventListener('click', () => {
+          const nowTick = td.innerHTML !== '✅';
+          td.innerHTML = nowTick ? '✅' : '⬜';
+          pack.rows[rowIdx][i] = nowTick ? '✅' : '';
+          saveState();
+        });
+      } else {
+        td.addEventListener('blur', onCellEdit);
+      }
+
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+
+  statusEl.textContent=`${rows.length||0} γραμμές · ${headers.length||0} στήλες`+(pack.accIdx===-1 && rows.length?' (Δεν βρέθηκε στήλη Accommodation)':'');
+}
+
+function onCellEdit(e){ const td=e.currentTarget; const r=+td.dataset.row, c=+td.dataset.col; const pack=ensurePack(currentOp); pack.rows[r][c]=td.textContent.trim(); saveState(); }
+
+function performHotelSearch(){
+  const pack=store[currentOp]; if(!pack) return;
+  const q=searchInput.value.trim().toLowerCase();
+  if(!q){ renderHotelsFor(currentOp); return; }
+  if(pack.accIdx===-1){ alert('Δεν εντοπίστηκε στήλη "Accommodation" στο Excel.'); return; }
+
+  const exact=pack.rows.filter(r=> String(r[pack.accIdx]).trim().toLowerCase()===q );
+  const result= exact.length? exact : pack.rows.filter(r=> String(r[pack.accIdx]).toLowerCase().includes(q) );
+
+  // Ensure "Signed" column is in correct position for the search view
+  const desiredIdx = 9;
+  const existingIdx = pack.headers.findIndex(h => String(h).trim().toLowerCase() === 'signed'.toLowerCase());
+  if (existingIdx !== -1 && existingIdx !== desiredIdx) {
+    // Create a mapped copy of result with "Signed" moved to desired index
+    result.forEach(r => {
+      const [val] = r.splice(existingIdx,1);
+      r.splice(desiredIdx,0,val);
+    });
+  } else if (existingIdx === -1) {
+    // If absent (edge case), add a virtual blank column for the view
+    result.forEach(r => r.splice(desiredIdx,0,''));
+  }
+
+  theadRow.innerHTML='';
+  // Fixed first header: Α/Α (αυτόματη αρίθμηση)
+  (function(){
+    const thIdx = document.createElement('th');
+    thIdx.textContent = 'Α/Α';
+    theadRow.appendChild(thIdx);
+  })();
+  // Μετά οι τίτλοι που έρχονται από το Excel
+  pack.headers.forEach((h,i)=>{
+    const th=document.createElement('th');
+    th.textContent=h;
+    theadRow.appendChild(th);
+  });
+
+  tbody.innerHTML='';
+  result.forEach((r,ri)=>{
+    const tr=document.createElement('tr');
+    tr.addEventListener('dblclick',()=>{
+      const idx=pack.rows.indexOf(r); if(idx>-1) openHotelModal(idx);
+    });
+// Numbering cell (left-most) in search view
+const tdNum=document.createElement('td'); tdNum.contentEditable='false'; tdNum.style.textAlign='right'; tdNum.textContent=String(ri+1);
+tr.appendChild(tdNum);
+
+pack.headers.forEach((h,i)=>{
+      const td = cellToNode(r[i]);
+      if (i === desiredIdx) {
+        td.contentEditable='false';
+        td.style.textAlign='center';
+        const current = (r[i]||'').trim() === '✅' ? '✅' : '⬜';
+        td.innerHTML = current;
+        td.addEventListener('click', () => {
+          const nowTick = td.innerHTML !== '✅';
+          td.innerHTML = nowTick ? '✅' : '⬜';
+          // Update the original row (find by index from the full dataset)
+          const originalIndex = pack.rows.findIndex(row => row === r);
+          if (originalIndex > -1) {
+            pack.rows[originalIndex][i] = nowTick ? '✅' : '';
+            saveState();
+          }
+        });
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  statusEl.textContent = `${result.length} αποτελέσματα αναζήτησης`;
+}
+searchInput.addEventListener('input', performHotelSearch);
+
+// Import Excel/CSV
+syncBtn.addEventListener('click', ()=> filePicker.click());
+filePicker.addEventListener('change', ()=>{
+  const f=filePicker.files && filePicker.files[0]; if(!f) return; const name=f.name.toLowerCase(); const reader=new FileReader();
+  if(name.endsWith('.xlsx')){
+    lazyLoadXLSX(()=>{ reader.onload=e=>{ const wb=XLSX.read(e.target.result,{type:'array'}); const sheet=wb.Sheets[wb.SheetNames[0]]; const json=XLSX.utils.sheet_to_json(sheet,{header:1,defval:''}); const headers=(json[0]||[]).map(h=>String(h).trim()); const rows=json.slice(1).filter(r=>r.some(c=>String(c).trim()!=='')); store[currentOp]={ headers, rows, accIdx: detectAccommodationKey(headers), emailIdx: detectEmailKey(headers), phoneIdx: detectPhoneKey(headers), siteIdx: detectSiteKey(headers) }; renderHotelsFor(currentOp); saveState(); }; reader.readAsArrayBuffer(f); });
+  } else if(name.endsWith('.csv')){
+    reader.onload=e=>{ const text=e.target.result; const lines=text.split(/\r?\n/).filter(l=>l.trim()!==''); const data=lines.map(l=>l.split(',').map(x=>x.trim())); const hs=data.shift()||[]; store[currentOp]={ headers: hs, rows: data, accIdx: detectAccommodationKey(hs), emailIdx: detectEmailKey(hs), phoneIdx: detectPhoneKey(hs), siteIdx: detectSiteKey(hs) }; renderHotelsFor(currentOp); saveState(); };
+    reader.readAsText(f,'utf-8');
+  } else { alert('Υποστήριξη μόνο για .xlsx ή .csv'); }
+});
+
+// Export Excel
+function exportToExcel(){ const pack=ensurePack(currentOp); if(!pack.headers.length){ alert('Δεν υπάρχουν δεδομένα.'); return; } lazyLoadXLSX(()=>{ const aoa=[pack.headers, ...pack.rows]; const ws=XLSX.utils.aoa_to_sheet(aoa); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Hotels'); XLSX.writeFile(wb, `hotels_${currentOp}.xlsx`); }); }
+
+downloadExcelBtn.addEventListener('click', exportToExcel);
+
+// Row/Column ops
+addRowBtn.addEventListener('click', ()=>{ const pack=ensurePack(currentOp); const cols=pack.headers.length||1; pack.rows.push(new Array(cols).fill('')); renderHotelsFor(currentOp); saveState(); });
+
+deleteRowsBtn.addEventListener('click', ()=>{ const pack=ensurePack(currentOp); const trs=[...tbody.querySelectorAll('tr')]; const toKeep=[]; trs.forEach((tr,i)=>{ if(!tr.classList.contains('selected')) toKeep.push(pack.rows[i]); }); pack.rows=toKeep; renderHotelsFor(currentOp); saveState(); });
+
+addColBtn.addEventListener('click', ()=>{ const pack=ensurePack(currentOp); const newName=prompt('Όνομα νέας στήλης;','Νέα στήλη'); pack.headers.push(newName||`Στήλη ${pack.headers.length+1}`); pack.rows.forEach(r=> r.push('')); 
+  pack.accIdx = detectAccommodationKey(pack.headers);
+  pack.emailIdx = detectEmailKey(pack.headers);
+  pack.phoneIdx = detectPhoneKey(pack.headers);
+  pack.siteIdx = detectSiteKey(pack.headers);
+  renderHotelsFor(currentOp); saveState(); });
+
+deleteColBtn.addEventListener('click', ()=>{ const pack=ensurePack(currentOp); if(!pack.headers.length) return; const idx=pack.headers.length-1; pack.headers.pop(); pack.rows.forEach(r=> r.splice(idx,1)); pack.accIdx = detectAccommodationKey(pack.headers); pack.emailIdx = detectEmailKey(pack.headers); pack.phoneIdx = detectPhoneKey(pack.headers); pack.siteIdx = detectSiteKey(pack.headers); renderHotelsFor(currentOp); saveState(); });
+
+/*** Capsule modal logic ***/
+const modal=document.getElementById('hotelModal');
+const closeModalBtn=document.getElementById('closeModal');
+const saveModalBtn=document.getElementById('saveModal');
+const modalTitle=document.getElementById('modalTitle');
+const mName=document.getElementById('mName');
+const mEmail=document.getElementById('mEmail');
+const mPhone=document.getElementById('mPhone');
+const mSite=document.getElementById('mSite');
+const miniTable=document.getElementById('miniTable').querySelector('tbody');
+const miniAdd=document.getElementById('miniAdd');
+let modalRowIndex=-1;
+
+function openHotelModal(rowIdx){ const pack=ensurePack(currentOp); const row=pack.rows[rowIdx]||[]; modalRowIndex=rowIdx; const name=row[pack.accIdx]||''; const email=pack.emailIdx>-1? row[pack.emailIdx]||'' : ''; const phone=pack.phoneIdx>-1? row[pack.phoneIdx]||'' : ''; const site=pack.siteIdx>-1? row[pack.siteIdx]||'' : '';
+  mName.value=name;
+mEmail.value=email;
+mPhone.value='';
+mSite.value=site; modalTitle.textContent = name? `Λεπτομέρειες — ${name}` : 'Λεπτομέρειες ξενοδοχείου';
+  miniTable.innerHTML=''; const stashKey='__mini__'; if(!row.__mini__) { try{ const j=pack.headers.indexOf(stashKey); if(j>-1 && row[j]) row.__mini__ = JSON.parse(row[j]); }catch(_){} }
+  const items=Array.isArray(row.__mini__)? row.__mini__: [];
+  items.forEach(addMiniRowFromData);
+  modal.classList.add('show');
+}
+function closeHotelModal(){ modal.classList.remove('show'); }
+closeModalBtn.addEventListener('click', closeHotelModal);
+modal.addEventListener('click', (e)=>{ if(e.target===modal) closeHotelModal(); });
+
+function addMiniRowFromData(it){
+  const tr = document.createElement('tr');
+  const cols = ['room','allocation','minPax','maxPax','totalMinBeds','totalMaxBeds'];
+  const tds = cols.map(c => {
+    const td = document.createElement('td');
+    td.contentEditable = 'true';
+    td.textContent = it?.[c] || '';
+    return td;
+  });
+  const del = document.createElement('button');
+  del.className = 'btn';
+  del.textContent = '✕';
+  del.addEventListener('click', ()=> tr.remove());
+  const tdDel = document.createElement('td');
+  tdDel.appendChild(del);
+  tds.forEach(td => tr.appendChild(td));
+  tr.appendChild(tdDel);
+  miniTable.appendChild(tr);
+}
+
+miniAdd.addEventListener('click', ()=> addMiniRowFromData({room:'',allocation:'',minPax:'',maxPax:'',totalMinBeds:'',totalMaxBeds:''}));
+
+saveModalBtn.addEventListener('click', ()=>{ const pack=ensurePack(currentOp); if(modalRowIndex<0) return; const row=pack.rows[modalRowIndex];
+  if(pack.accIdx===-1){ 
+    pack.headers.unshift('Accommodation'); pack.rows.forEach(r=> r.unshift('')); pack.accIdx=0; }
+  row[pack.accIdx]=mName.value.trim(); if(pack.emailIdx===-1){ if(!pack.headers.includes('Email')){ pack.headers.push('Email'); pack.rows.forEach(r=> r.push('')); } pack.emailIdx=pack.headers.indexOf('Email'); }
+  if(pack.phoneIdx===-1){ if(!pack.headers.includes('Τηλέφωνο')){ pack.headers.push('Τηλέφωνο'); pack.rows.forEach(r=> r.push('')); } pack.phoneIdx=pack.headers.indexOf('Τηλέφωνο'); }
+  if(pack.siteIdx===-1){ if(!pack.headers.includes('Website')){ pack.headers.push('Website'); pack.rows.forEach(r=> r.push('')); } pack.siteIdx=pack.headers.indexOf('Website'); }
+  row[pack.emailIdx]=mEmail.value.trim(); row[pack.phoneIdx]=mPhone.value.trim(); row[pack.siteIdx]=mSite.value.trim();
+  const stashKey='__mini__'; if(!pack.headers.includes(stashKey)){ pack.headers.push(stashKey); pack.rows.forEach(r=> r.push('')); }
+  const stashIdx=pack.headers.indexOf(stashKey); const items=[...miniTable.querySelectorAll('tr')].map(tr=>{
+  const tds=tr.querySelectorAll('td');
+  return {
+    room: tds[0].textContent.trim(),
+    allocation: tds[1].textContent.trim(),
+    minPax: tds[2].textContent.trim(),
+    maxPax: tds[3].textContent.trim(),
+    totalMinBeds: tds[4].textContent.trim(),
+    totalMaxBeds: tds[5].textContent.trim()
+  };
+});
+  row.__mini__ = items; row[stashIdx]=JSON.stringify(items);
+  renderHotelsFor(currentOp); saveState(); closeHotelModal();
+});
+
+/*** Transfers ***/
+const tlGrid=document.getElementById('tlGrid');
+const tlStatus=document.getElementById('tlStatus');
+const prevDayBtn=document.getElementById('prevDay');
+const todayBtn=document.getElementById('todayBtn');
+const nextDayBtn=document.getElementById('nextDay');
+const jumpDateInp=document.getElementById('jumpDate');
+const jumpBtn=document.getElementById('jumpBtn');
+const uploadBtn=document.getElementById('uploadBtn');
+const wordpadPicker=document.getElementById('wordpadPicker');
+const VIEW_DAYS=30; const EFL='EFL'; let windowStart=new Date(); windowStart.setHours(0,0,0,0); let globalTransfers=[];
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function iso(d){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()).toISOString().slice(0,10); }
+uploadBtn.addEventListener('click',()=>wordpadPicker.click());
+wordpadPicker.addEventListener('change',()=>{ const f=wordpadPicker.files && wordpadPicker.files[0]; if(!f) return; const reader=new FileReader(); reader.onload=e=>ingestTransfersText(e.target.result, f.name.toLowerCase().endsWith('.rtf'), f.name); reader.readAsText(f,'utf-8'); });
+prevDayBtn.addEventListener('click',()=>{ windowStart=addDays(windowStart,-1); renderTransfersWindow(); saveState(); });
+ todayBtn.addEventListener('click',()=>{ windowStart=new Date(); windowStart.setHours(0,0,0,0); renderTransfersWindow(); saveState(); });
+ nextDayBtn.addEventListener('click',()=>{ windowStart=addDays(windowStart,1); renderTransfersWindow(); saveState(); });
+ jumpBtn.addEventListener('click',()=>{ if(!jumpDateInp.value) return; const d=new Date(jumpDateInp.value); d.setHours(0,0,0,0); windowStart=d; renderTransfersWindow(); saveState(); });
+(function(){ const sel=document.getElementById('filterOperator'); if(sel) sel.addEventListener('change',()=>{ try{ renderTransfersWindow(); }catch(_){ } }); })();
+function stripRTF(rt){ return rt.replace(/\\'[0-9a-fA-F]{2}/g,' ').replace(/\\[a-z]+\\d* /g,'').replace(/[{}]/g,'').replace(/\\par[d]/g,'\n'); }
+function parseDate(s){ s=String(s).replace(/^\uFEFF/,'').trim(); let m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(m) return new Date(+m[1],+m[2]-1,+m[3]); m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/); if(m) return new Date(+m[3],+m[2]-1,+m[1]); const d=new Date(s); return isNaN(d.getTime())?null:d; }
+function looksLikeManifest(line){ const p=line.split(';'); if(p.length<10) return false; const dateOk = /^\uFEFF?\d{4}-\d{2}-\d{2}$/.test((p[0]||'').trim()); const i3=/^[A-Z]{3}$/; return dateOk && i3.test((p[2]||'').trim().toUpperCase().slice(0,3)) && i3.test((p[4]||'').trim().toUpperCase().slice(0,3)); }
+function parseManifest(text, inferredOp=''){
+  const lines = text.split(/\r?\n/).filter(l=>l.trim()!=='');
+
+  // group by reservation id + date + hotel + area + type + flight/time
+  const grouped = new Map();
+  function keyOf(o){
+    return [o.resId, o.type, o.hotel, o.area, o.flight, o.time, o.date.toISOString().slice(0,10)].join('|');
+  }
+
+  for(const line of lines){
+    if(!looksLikeManifest(line)) continue;
+    const p=line.split(';');
+
+    const date = parseDate((p[0]||'').trim()); if(!date) continue;
+    const flight = (p[1]||'').trim();          // 2ο πεδίο
+    const depApt = (p[2]||'').trim().toUpperCase();
+    const depTime = (p[3]||'').trim();         // 4ο πεδίο
+    const arrApt = (p[4]||'').trim().toUpperCase();
+    const arrTime = (p[5]||'').trim();         // 6ο πεδίο
+    const hotel = (p[8]||'').trim();
+    const area  = (p[9]||'').trim();
+    const resId = (p[12]||'').trim();
+    // robust Private detection
+    let lastNonEmpty = '';
+    for (let i = p.length - 1; i >= 0; i--) {
+      const val = String(p[i]||'').trim();
+      if (val) { lastNonEmpty = val; break; }
+    }
+    const note = lastNonEmpty;
+    const isPrivate = /private\s*transfer/i.test(note) || p.some(f => /private\s*transfer/i.test(String(f||'')));
+    // capture passenger name: surname=15ο πεδίο (index 14), name=16ο πεδίο (index 15)
+    const surname = (p[14]||'').trim();
+    const given   = (p[15]||'').trim();
+    const name = (surname || given) ? `${surname}${surname&&given?' ':''}${given}` : '';          // 13ο πεδίο
+
+    // determine type/time by EFL position
+    const isArrival = arrApt.startsWith(EFL) && !depApt.startsWith(EFL);
+    const type = isArrival ? 'arrival' : 'departure';
+    const time = isArrival ? arrTime : depTime;
+
+    const item = {date, area, hotel, pax:1, type, operator: inferredOp, flight, time, resId, isPrivate, names: name? [name] : []};
+    const k = keyOf(item);
+    if(grouped.has(k)){
+      const g = grouped.get(k);
+      g.pax += 1;
+      if (name) g.names.push(name);
+      g.isPrivate = g.isPrivate || isPrivate;
+    }else{
+      grouped.set(k, item);
+    }
+  }
+  // flatten
+  return Array.from(grouped.values());
+}
+
+function ingestTransfersText(text,isRTF=false,filename=''){
+  if(isRTF || /^\{\rtf/.test(text)) text=stripRTF(text);
+  // infer operator from filename
+  let inferredOp='';
+  const low = String(filename||'').toLowerCase();
+  if(/sunweb/.test(low)) inferredOp='Sunweb';
+  else if(/blue/.test(low)) inferredOp='Blue Style';
+  else if(/grecos/.test(low)) inferredOp='Grecos';
+  else if(/palma/.test(low)) inferredOp='Palma';
+  else if(/satur/.test(low)) inferredOp='Satur';
+
+  // Parse new items
+  const newItems = parseManifest(text, inferredOp) || [];
+
+  // Prepare existing array
+  if(!Array.isArray(globalTransfers)) window.globalTransfers = [];
+
+  // Build an index for fast merge on composite key
+  const keyOf = (o)=>[
+    o.resId||'',
+    o.type||'',
+    String(o.hotel||'').trim(),
+    String(o.area||'').trim(),
+    String(o.flight||'').trim(),
+    (o.date instanceof Date ? iso(o.date) : String(o.date||'')),
+    o.isPrivate ? 'PR' : 'SH'
+  ].join('|');
+
+  const index = new Map();
+  globalTransfers.forEach(it => index.set(keyOf(it), it));
+
+  // Merge new items into globalTransfers
+  newItems.forEach(ni => {
+    const k = keyOf(ni);
+    if(index.has(k)){
+      const ex = index.get(k);
+      ex.pax = (+ex.pax||0) + (+ni.pax||0);
+      // merge names
+      if(Array.isArray(ni.names) && ni.names.length){
+        ex.names = Array.isArray(ex.names) ? ex.names.concat(ni.names) : ni.names.slice();
+      }
+      // private flag
+      ex.isPrivate = !!(ex.isPrivate || ni.isPrivate);
+      // keep earliest/latest times as-is (prefer arrival/dep existing if empty)
+      if(!ex.time && ni.time) ex.time = ni.time;
+      if(!ex.operator && ni.operator) ex.operator = ni.operator;
+    }else{
+      globalTransfers.push(ni);
+      index.set(k, ni);
+    }
+  });
+
+  tlStatus.textContent = 'Φορτώθηκαν ' + newItems.length + ' νέες εγγραφές • Σύνολο στη μνήμη: ' + globalTransfers.length;
+  try{ renderTransfersWindow(); saveState(); }catch(_){}
+}
+// ---- helpers: totals on new data structure (arrays per hotel) ----
+function totalPaxForBucket(bucket){ // bucket: { [hotel]: Item[] }
+  if(!bucket) return 0;
+  return Object.values(bucket).reduce((sumHotel, items)=> 
+    sumHotel + (Array.isArray(items) ? items.reduce((s,it)=> s + (+it.pax||0), 0) : 0), 0);
+}
+function totalPaxForArea(aggByType, area){ // aggByType: agg.arrival or agg.departure
+  const perDay = (aggByType && aggByType[area]) ? aggByType[area] : {};
+  return Object.values(perDay).reduce((sumDay, bucket)=> sumDay + totalPaxForBucket(bucket), 0);
+}
+
+function renderTransfersWindow(){ function startOfDay(d){ const x=new Date(d); x.setHours(0,0,0,0); return x; } const days=[]; for(let i=0;i<30;i++) days.push(addDays(windowStart,i)); const inRange=globalTransfers.filter(it=> +startOfDay(it.date)>=+startOfDay(days[0]) && +startOfDay(it.date)<=+startOfDay(days[29])); const areasArr=[...new Set(inRange.filter(i=>i.type==='arrival').map(i=>i.area).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'el')); const areasDep=[...new Set(inRange.filter(i=>i.type==='departure').map(i=>i.area).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'el')); const agg={arrival:{},departure:{}};
+  areasArr.forEach(a=>{ agg.arrival[a]={}; days.forEach(d=> agg.arrival[a][iso(d)]={}); });
+  areasDep.forEach(a=>{ agg.departure[a]={}; days.forEach(d=> agg.departure[a][iso(d)]={}); });
+  inRange.forEach(it=>{
+    const k=iso(it.date);
+    const b=agg[it.type];
+    if(!b[it.area]) return;
+    const bucket = b[it.area][k];
+    if(!bucket[it.hotel]) bucket[it.hotel]=[];
+    bucket[it.hotel].push(it);
+  }); const totalsArr={};
+  areasArr.forEach(a=> {
+    totalsArr[a] = Object.values(agg.arrival[a]).reduce((sumDay, hotelsMap) => {
+      return sumDay + Object.values(hotelsMap).reduce((sumHotel, items) => {
+        return sumHotel + items.reduce((pp,it)=> pp + (it.pax||0), 0);
+      }, 0);
+    }, 0);
+  });
+  const totalsDep={};
+  areasDep.forEach(a=> {
+    totalsDep[a] = Object.values(agg.departure[a]).reduce((sumDay, hotelsMap) => {
+      return sumDay + Object.values(hotelsMap).reduce((sumHotel, items) => {
+        return sumHotel + items.reduce((pp,it)=> pp + (it.pax||0), 0);
+      }, 0);
+    }, 0);
+  }); const tlGrid=document.getElementById('tlGrid'); tlGrid.innerHTML=''; const hcell=(t)=>{ const el=document.createElement('div'); el.className='hcell'; el.textContent=t; return el; }; const section=(t)=>{ const el=document.createElement('div'); el.className='section'; el.textContent=t; return el; }; const rlabel=(t,total,cls)=>{ const el=document.createElement('div'); el.className='rlabel '+cls; el.innerHTML=`<span>${t}</span><span>Σύνολο: <b>${total}</b></span>`; return el; }; tlGrid.appendChild(hcell('Διαδρομή')); days.forEach(d=> tlGrid.appendChild(hcell(d.toLocaleDateString('el-GR',{weekday:'short',day:'2-digit',month:'2-digit'}))) ); tlGrid.appendChild(section('ΑΦΙΞΕΙΣ (Airport → Περιοχή)')); if(!areasArr.length){ const msg=document.createElement('div'); msg.style.gridColumn=`1 / span ${1+30}`; msg.style.padding='12px 16px'; msg.textContent='—'; tlGrid.appendChild(msg); } areasArr.forEach(a=>{ tlGrid.appendChild(rlabel(`Airport → ${a}`, totalsArr[a], 'arr')); days.forEach(d=>{ const k=iso(d); const cell=document.createElement('div'); cell.className='cell'; const hotels=agg.arrival[a][k]||{}; Object.keys(hotels).sort((x,y)=>x.localeCompare(y,'el')).forEach(h=>{ 
+const items = Array.isArray(hotels[h]) ? hotels[h] : [];
+// Group items by FLIGHT and PRIVACY for this hotel; show one capsule per (flight + privacy)
+const byFlight = {};
+items.forEach(it => {
+  const f = String(it.flight||'').trim() || '__NOFL__';
+  const key = `${f}|${it.isPrivate ? 'PR' : 'SH'}`;
+  if(!byFlight[key]) byFlight[key] = { sample: it, pax: 0, isPrivate: !!it.isPrivate, flightKey: f };
+  byFlight[key].pax += (+it.pax||0);
+});
+Object.keys(byFlight).forEach(fk => {
+  const g = byFlight[fk];
+  const item = g.sample;
+  const chip=document.createElement('span'); chip.className='chip';
+  const op=item.operator||'';
+  const opClass = op==='Sunweb'?'cd-cap-sunweb': op==='Blue Style'?'cd-cap-blue': op==='Palma'?'cd-cap-palma': op==='Satur'?'cd-cap-satur': op==='Grecos'?'cd-cap-grecos':'';
+  const cleanName = String(h||'').replace(/\b(Appartementen|Aparthotel|Hotel)\b\s*/gi,'').trim();
+  const opHtml = op ? `<div class='tf-op cd-capsule ${opClass}'>${op}</div>` : '';
+  const nameHtml = `<div class='tf-name'>${cleanName}</div>`;
+  const paxHtml = `<span class='tf-pax'>${g.pax||0}</span>`;
+const timeHtml = item.time ? `<div class='tf-time'>${item.time}</div>` : '';
+const flightTxt = g.flightKey === '__NOFL__' ? (item.flight||'') : g.flightKey;
+const flightHtml = flightTxt ? `<div class='tf-flight'>${flightTxt}</div>` : '';
+const metaHtml = `<div class='tf-meta'>${timeHtml}${flightHtml}</div>`;
+const badge = g.isPrivate ? `<span class='tf-private'>Private</span>` : '';
+chip.innerHTML = `${opHtml}${nameHtml}<div class='tf-row'>${paxHtml}${metaHtml}</div>` + badge;
+  chip.dataset.resId = item.resId||''; chip.dataset.hotel=h; chip.dataset.area=item.area||''; chip.dataset.date=iso(item.date); chip.dataset.type=item.type; chip.dataset.names=(item.names||[]).join('|'); chip.dataset.arrtime=(item.type==='arrival'? item.time:''); chip.dataset.deptime=(item.type==='departure'? item.time:'');
+  cell.appendChild(chip);
+});
+ }); tlGrid.appendChild(cell); }); }); tlGrid.appendChild(section('ΑΝΑΧΩΡΗΣΕΙΣ (Περιοχή → Airport)')); if(!areasDep.length){ const msg=document.createElement('div'); msg.style.gridColumn=`1 / span ${1+30}`; msg.style.padding='12px 16px'; msg.textContent='—'; tlGrid.appendChild(msg); } areasDep.forEach(a=>{ tlGrid.appendChild(rlabel(`${a} → Airport`, totalsDep[a], 'dep')); days.forEach(d=>{ const k=iso(d); const cell=document.createElement('div'); cell.className='cell'; const hotels=agg.departure[a][k]||{}; Object.keys(hotels).sort((x,y)=>x.localeCompare(y,'el')).forEach(h=>{ const items = Array.isArray(hotels[h]) ? hotels[h] : [];
+        items.forEach(item=>{ const chip=document.createElement('span'); chip.className='chip';
+        chip.innerHTML = (function(){
+  const op=item.operator||'';
+  const opClass = op==='Sunweb'?'cd-cap-sunweb': op==='Blue Style'?'cd-cap-blue': op==='Palma'?'cd-cap-palma': op==='Satur'?'cd-cap-satur': op==='Grecos'?'cd-cap-grecos':'';
+  const cleanName = String(h||'').replace(/\b(Appartementen|Aparthotel|Hotel)\b\s*/gi,'').trim();
+  const opHtml = op ? `<div class='tf-op cd-capsule ${opClass}'>${op}</div>` : '';
+  const nameHtml = `<div class='tf-name'>${cleanName}</div>`;
+  const paxHtml = `<span class='tf-pax'>${item.pax||1}</span>`;
+  const timeHtml = item.time ? `<div class='tf-time'>${item.time}</div>` : '';
+  const flightHtml = item.flight ? `<div class='tf-flight'>${item.flight}</div>` : '';
+  const metaHtml = `<div class='tf-meta'>${timeHtml}${flightHtml}</div>`;
+  return `${opHtml}${nameHtml}<div class='tf-row'>${paxHtml}${metaHtml}</div>` + (item.isPrivate?`<span class='tf-private'>Private</span>`:'');
+})();
+        chip.dataset.resId = item.resId||''; chip.dataset.hotel=h; chip.dataset.area=item.area||''; chip.dataset.date=iso(item.date); chip.dataset.type=item.type; chip.dataset.names=(item.names||[]).join('|'); chip.dataset.arrtime=(item.type==='arrival'? item.time:''); chip.dataset.deptime=(item.type==='departure'? item.time:'');
+        cell.appendChild(chip); }); }); tlGrid.appendChild(cell); }); }); }
+
+/*** Splash ***/
+(function(){
+  const body=document.body; const splash=document.getElementById('splash'); const wrap=document.getElementById('logoWrap'); if(!splash||!wrap){ body.classList.remove('splash-active'); body.classList.add('splash-done'); return; }
+  const words=["CARPE","DIEM"]; const baseDur=1.0, totalDelaySpan=2.0, hold=1.2, fadeDur=1.0; words.forEach((w, wi)=>{ const wEl=document.createElement('div'); wEl.className='word'; const step=(w.length>1)?(totalDelaySpan/(w.length-1)):0; [...w].forEach((ch,i)=>{ const span=document.createElement('span'); span.className='char'; const wordOffset=wi*0.08; const delay=(i*step)+wordOffset; span.style.setProperty('--delay', delay+'s'); span.textContent=ch; wEl.appendChild(span); }); wrap.appendChild(wEl); });
+  const inTime=baseDur+totalDelaySpan; setTimeout(()=>{ splash.classList.add('hidden'); body.classList.remove('splash-active'); body.classList.add('splash-done'); setTimeout(()=> splash.remove(), 900); }, (inTime+hold+fadeDur)*1000 + 50);
+})();
+
+// Boot
+loadState(); if(!location.hash) location.hash = '#/' + currentOp; if (Array.isArray(globalTransfers) && globalTransfers.length) { try { renderTransfersWindow(); } catch(e) { console.warn(e); } } navigate();
+
+// Open read-only modal on double-click for Private Transfers
+document.addEventListener('dblclick', (ev)=>{
+  const chip = ev.target.closest && ev.target.closest('.chip');
+  if(!chip) return;
+  if(!chip.querySelector('.tf-private')) return; // only private chips
+  const modal = document.getElementById('cdPrivateModal');
+  const meta  = document.getElementById('cdPrivateMeta');
+  const list  = document.getElementById('cdPrivatePassengers');
+  const resId = chip.dataset.resId || '';
+  const all = (globalTransfers||[]).filter(x => (x.resId||'')===resId);
+  let arrDate='', arrTime='', depDate='', depTime='';
+  all.forEach(x=>{
+    const dStr = iso(x.date);
+    if(x.type==='arrival'){ arrDate=dStr; arrTime=x.time||arrTime; }
+    if(x.type==='departure'){ depDate=dStr; depTime=x.time||depTime; }
+  });
+  const names = (chip.dataset.names||'').split('|').filter(Boolean);
+  meta.innerHTML = `<div><b>Ξενοδοχείο:</b> ${chip.dataset.hotel}</div>
+                    <div><b>Άφιξη:</b> ${arrDate||'-'} ${arrTime||''}</div>
+                    <div><b>Αναχώρηση:</b> ${depDate||'-'} ${depTime||''}</div>`;
+  list.innerHTML = names.map(n=> `<li>${n}</li>`).join('') || '<li>—</li>';
+  modal.style.display='flex';
+});
+
+
+// Διαγραφή όλων των κρατήσεων (Transfers) — injected
+(function(){
+  const btn = document.getElementById('clearAllTransfersBtn');
+  if(!btn) return;
+  btn.addEventListener('click', () => {
+    if (!confirm('Είσαι σίγουρος ότι θέλεις να διαγράψεις όλες τις κρατήσεις;')) return;
+    try {
+      globalTransfers = [];
+      if (typeof saveState === 'function') saveState();
+      if (typeof renderTransfersWindow === 'function') renderTransfersWindow();
+      if (typeof tlGrid !== 'undefined') tlGrid.innerHTML = '';
+      if (typeof tlStatus !== 'undefined') tlStatus.textContent = 'Δεν έχουν εισαχθεί δεδομένα';
+      alert('Όλες οι κρατήσεις διαγράφηκαν επιτυχώς.');
+    } catch(e){
+      console.error(e);
+      alert('Κάτι πήγε στραβά κατά τη διαγραφή.');
+    }
+  });
+})();
+
+</script>
+
+<!-- BEGIN: Transfer Plus Modal Injection -->
+<style>
+  .cd-tiny-plus{width:28px;height:28px;border-radius:10px;border:1px solid rgba(255,255,255,.2);
+    background:rgba(255,255,255,.06);display:grid;place-items:center;cursor:pointer}
+  .cd-tiny-plus:hover{background:rgba(255,255,255,.1)}
+  .cd-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:9999}
+  .cd-modal.show{display:flex}
+  .cd-card{width:min(720px,95vw);border:1px solid rgba(255,255,255,.15);border-radius:20px;background:linear-gradient(180deg, rgba(18,25,45,.96), rgba(14,20,36,.96));box-shadow:0 20px 50px rgba(0,0,0,.45)}
+  .cd-card header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.15)}
+  .cd-card h3{margin:0;font-size:18px;color:#fff}
+  .cd-card .cd-content{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .cd-label{font-size:12px;color:#9fb0c7}
+  .cd-input, .cd-select{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 12px;color:#e6edf7}
+  .cd-row{grid-column:1/-1}
+  .cd-footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:12px 16px;border-top:1px solid rgba(255,255,255,.15)}
+  .cd-btn{appearance:none;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#e6edf7;padding:9px 12px;border-radius:10px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+  .cd-btn:hover{background:rgba(255,255,255,.1)}
+  .cd-capsule{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}
+  .cd-cap-sunweb{background:#ec4899;color:white} /* ροζ */ 
+  .cd-cap-blue{background:#2563eb;color:white} /* μπλε */
+  .cd-cap-palma{background:#f59e0b;color:white} /* πορτοκαλί */
+  .cd-cap-satur{background:#dc2626;color:white} /* κόκκινο */
+  .cd-cap-grecos{background:#38bdf8;color:white} /* γαλάζιο */
+  .cd-tag-private{border:1px dashed rgba(255,255,255,.6);font-size:11px;padding:2px 6px;border-radius:999px;opacity:.9;color:#e6edf7}
+</style>
+
+<div class="cd-modal" id="cdTransferModal" aria-hidden="true">
+  <div class="cd-card">
+    <header>
+      <h3>Νέο Transfer</h3>
+      <div>
+        <button class="cd-btn" id="cdCloseTf">Ακύρωση</button>
+        <button class="cd-btn" id="cdSaveTf">Αποθήκευση</button>
+      </div>
+    </header>
+    <div class="cd-content">
+      <div>
+        <label class="cd-label">Από</label>
+        <input class="cd-input" id="cdFrom" placeholder="π.χ. Airport ή Λαγανάς" />
+      </div>
+      <div>
+        <label class="cd-label">Προς</label>
+        <input class="cd-input" id="cdTo" placeholder="π.χ. Λαγανάς ή Airport" />
+      </div>
+      <div>
+        <label class="cd-label">Αριθμός Ατόμων</label>
+        <input class="cd-input" id="cdPax" type="number" min="1" value="1" />
+      </div>
+      <div>
+        <label class="cd-label">Πτήση</label>
+        <input class="cd-input" id="cdFlight" placeholder="π.χ. EFL123" />
+      </div>
+      <div>
+        <label class="cd-label">Ώρα</label>
+        <input class="cd-input" id="cdTime" type="time" />
+      </div>
+      <div>
+        <label class="cd-label">Tour Operator</label>
+        <select id="cdOp" class="cd-select">
+          <option value="">—</option>
+          <option value="Sunweb">Sunweb</option>
+          <option value="Blue Style">Blue Style</option>
+          <option value="Palma">Palma</option>
+          <option value="Satur">Satur</option>
+          <option value="Grecos">Grecos</option>
+        </select>
+        <div style="margin-top:6px;font-size:12px;color:#9fb0c7" id="cdOpPreview"></div>
+      </div>
+      <div class="cd-row">
+        <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="cdReturn" />
+          <span>Επιστροφή</span>
+        </label>
+      </div>
+      <div id="cdReturnFields" class="cd-row" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px">
+          <div>
+            <label class="cd-label">Επιστροφή — Από</label>
+            <input class="cd-input" id="cdRtFrom" />
+          </div>
+          <div>
+            <label class="cd-label">Επιστροφή — Προς</label>
+            <input class="cd-input" id="cdRtTo" />
+          </div>
+          <div>
+            <label class="cd-label">Πτήση</label>
+            <input class="cd-input" id="cdRtFlight" placeholder="π.χ. EFL456" />
+          </div>
+          <div>
+            <label class="cd-label">Ώρα</label>
+            <input class="cd-input" id="cdRtTime" type="time" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cd-footer">
+      <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer" title="Σήμανση ιδιωτικού">
+        <input type="checkbox" id="cdPrivate" />
+        <span>Private</span>
+      </label>
+    </div>
+  </div>
+</div>
+</script>
+
+<script>
+(function(){
+  // Colors
+  const OP_COLORS = {
+    'Sunweb': 'cd-cap-sunweb',
+    'Blue Style': 'cd-cap-blue',
+    'Palma': 'cd-cap-palma',
+    'Satur': 'cd-cap-satur',
+    'Grecos': 'cd-cap-grecos'
+  };
+
+  // Try to find existing Transfers nav and append a small + next to it
+  function attachPlusButton(){
+    const candidates = Array.from(document.querySelectorAll('a, button, [role="link"], [data-nav]'));
+    const target = candidates.find(el => /transfer/i.test(el.textContent || '') || /μεταφορ/.test(el.textContent || '') );
+    const plus = document.createElement('button');
+    plus.id = 'cdNewTransferBtn';
+    plus.className = 'cd-tiny-plus';
+    plus.title = 'Νέο transfer';
+    plus.textContent = '+';
+    plus.addEventListener('click', openModal);
+    if(target && target.parentElement){
+      target.parentElement.appendChild(plus);
+    } else {
+      // fallback floating button
+      Object.assign(plus.style, {position:'fixed',left:'14px',bottom:'18px',zIndex:9999});
+      document.body.appendChild(plus);
+    }
+  }
+
+  // Modal refs
+  const modal = document.getElementById('cdTransferModal');
+  const opPreview = document.getElementById('cdOpPreview');
+  const f = {
+    from: document.getElementById('cdFrom'),
+    to: document.getElementById('cdTo'),
+    pax: document.getElementById('cdPax'),
+    flight: document.getElementById('cdFlight'),
+    time: document.getElementById('cdTime'),
+    op: document.getElementById('cdOp'),
+    priv: document.getElementById('cdPrivate'),
+    ret: document.getElementById('cdReturn'),
+    rtWrap: document.getElementById('cdReturnFields'),
+    rtFrom: document.getElementById('cdRtFrom'),
+    rtTo: document.getElementById('cdRtTo'),
+    rtFlight: document.getElementById('cdRtFlight'),
+    rtTime: document.getElementById('cdRtTime')
+  };
+
+  function resetFields(){
+    f.from.value=''; f.to.value=''; f.pax.value='1'; f.flight.value=''; f.time.value=''; f.op.value=''; f.priv.checked=false;
+    f.ret.checked=false; f.rtWrap.style.display='none'; f.rtFrom.value=''; f.rtTo.value=''; f.rtFlight.value=''; f.rtTime.value='';
+    opPreview.innerHTML='';
+  }
+  function openModal(){ resetFields(); modal.classList.add('show'); }
+  function closeModal(){ modal.classList.remove('show'); }
+
+  document.getElementById('cdCloseTf').addEventListener('click', closeModal);
+  document.getElementById('cdSaveTf').addEventListener('click', saveTransfer);
+
+  f.op.addEventListener('change', ()=>{
+    const val = f.op.value;
+    if(!val){ opPreview.innerHTML=''; return; }
+    const cls = OP_COLORS[val] || '';
+    opPreview.innerHTML = '<span class="cd-capsule '+cls+'">'+val+'</span> — χρώμα κάψουλας';
+  });
+
+  f.ret.addEventListener('change', ()=>{
+    if(f.ret.checked){
+      f.rtFrom.value = f.to.value;
+      f.rtTo.value = f.from.value;
+      f.rtFlight.value = '';
+      f.rtTime.value = '';
+      f.rtWrap.style.display='block';
+    }else{
+      f.rtWrap.style.display='none';
+    }
+  });
+
+  // Minimal in-memory store. If the host page has a calendar API, hook here.
+  window.__cdTransfers = window.__cdTransfers || [];
+
+  function saveTransfer(){
+    const from = f.from.value.trim(), to = f.to.value.trim();
+    if(!from || !to){ alert('Συμπληρώστε «Από» και «Προς».'); return; }
+    const pax = Math.max(1, parseInt(f.pax.value || '1', 10));
+    const op = f.op.value || '';
+    const priv = !!f.priv.checked;
+    const flight = f.flight.value.trim();
+    const time = f.time.value.trim();
+
+    const isArrival = /airport|EFL/i.test(from);
+    const isDeparture = /airport|EFL/i.test(to);
+    const type = isArrival ? 'arrival' : (isDeparture ? 'departure' : 'custom');
+
+    const base = {date:new Date().toISOString(), from, to, pax, operator:op, private:priv, flight, time, type, label: from+' → '+to};
+    window.__cdTransfers.push(base);
+
+    if(f.ret.checked){
+      const back = {date:new Date().toISOString(), from: to, to: from, pax, operator: op, private: priv, flight: f.rtFlight.value.trim(), time: f.rtTime.value.trim(), type: type==='arrival'?'departure':'arrival', label: to+' → '+from};
+      window.__cdTransfers.push(back);
+    }
+
+    // Optional: dispatch a CustomEvent so the host app can listen and add to its calendar
+    document.dispatchEvent(new CustomEvent('cd:transfer:created', { detail: { items: window.__cdTransfers.slice(- (f.ret.checked?2:1)) } }));
+
+    closeModal();
+  }
+
+  // click outside to close
+  modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+
+  // Attach the + button after DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachPlusButton);
+  } else {
+    attachPlusButton();
+  }
+})();
+</script>
+<!-- END: Transfer Plus Modal Injection -->
+
+<div id="cdPrivateModal" class="cd-modal" aria-modal="true" role="dialog">
+  <div class="card">
+    <header>
+      <h3>Private Transfer</h3>
+      <button class="close" onclick="document.getElementById('cdPrivateModal').style.display='none'">Κλείσιμο</button>
+    </header>
+    <div class="content">
+      <div class="muted" id="cdPrivateMeta"></div>
+      <ul id="cdPrivatePassengers"></ul>
+    </div>
+  </div>
+</div>
+
+
+<div id="pinModal" role="dialog" aria-modal="true">
+  <div class="card">
+    <header>
+      <h3>Επιβεβαίωση διαγραφής</h3>
+      <button class="btn" onclick="document.getElementById('pinModal').style.display='none'">Κλείσιμο</button>
+    </header>
+    <div>Για να διαγραφούν ΌΛΑ τα δεδομένα, εισάγετε το PIN:</div>
+    <div class="row" style="margin-top:8px">
+      <input id="pinInput" type="password" placeholder="PIN" autocomplete="off" />
+    </div>
+    <div id="pinError"></div>
+    <div class="actions">
+      <button id="pinCancel" class="btn" onclick="document.getElementById('pinModal').style.display='none'">Άκυρο</button>
+      <button id="pinConfirm" class="btn danger">Διαγραφή</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- Secure clear-all with PIN ---
+window.CLEAR_PIN = window.CLEAR_PIN || '2468'; // αλλάζεις εδώ το PIN
+
+(function(){
+  const btn = document.getElementById('clearAllBtn');
+  if(!btn) return;
+  const modal = document.getElementById('pinModal');
+  const inp = document.getElementById('pinInput');
+  const err = document.getElementById('pinError');
+  const confirmBtn = document.getElementById('pinConfirm');
+
+  btn.addEventListener('click', ()=>{
+    err.textContent='';
+    inp.value='';
+    modal.style.display='flex';
+    setTimeout(()=> inp.focus(), 0);
+  });
+
+  function doClear(){
+    if(inp.value !== String(window.CLEAR_PIN)){
+      err.textContent='Λάθος PIN.';
+      return;
+    }
+    try{
+      window.globalTransfers = [];
+      tlStatus.textContent = 'Όλα τα δεδομένα διαγράφηκαν.';
+      // επαναφορά σε σήμερα
+      windowStart = new Date(); windowStart.setHours(0,0,0,0);
+      renderTransfersWindow();
+      if(typeof saveState==='function') saveState();
+    }catch(e){ console.error(e); }
+    modal.style.display='none';
+  }
+
+  confirmBtn.addEventListener('click', doClear);
+  inp.addEventListener('keydown', (e)=>{ if(e.key==='Enter') doClear(); });
+})();</script>
+<script>
+// ---- Operator filter ----
+window.currentOperatorFilter = '__ALL__';
+
+function populateOperatorFilter(){
+  const sel = document.getElementById('filterOperator');
+  if(!sel) return;
+  const prev = sel.value || '__ALL__';
+  // collect unique operators from data
+  const ops = new Set();
+  (globalTransfers||[]).forEach(x => { if(x.operator) ops.add(x.operator); });
+  // ensure some defaults too
+  ['Sunweb','Blue Style','Grecos','Palma','Satur','Eliza'].forEach(o=> ops.add(o));
+  // rebuild options
+  const chosen = prev || '__ALL__';
+  sel.innerHTML = '<option value="__ALL__">Όλοι</option>' + Array.from(ops).sort().map(o=>`<option value="${o}">${o}</option>`).join('');
+  sel.value = chosen;
+}
+
+(function(){
+  const sel = document.getElementById('filterOperator');
+  if(!sel) return;
+  populateOperatorFilter();
+  sel.addEventListener('change', ()=>{
+    window.currentOperatorFilter = sel.value || '__ALL__';
+    try{ renderTransfersWindow(); }catch(_){}
+  });
+})();
+</script>
+<!-- 🔥 Firebase σύνδεση -->
+<!-- Firebase compat (δουλεύει παντού) -->
+<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyC5IUylaLkimi4uWLN4-y0ufri06EYBBMg",
+    authDomain: "carpe-diem-transfers.firebaseapp.com",
+    projectId: "carpe-diem-transfers",
+    storageBucket: "carpe-diem-transfers.appspot.com",
+    messagingSenderId: "273090430362",
+    appId: "1:273090430362:web:c47922ba05af78a1c12623",
+    measurementId: "G-WEZ30SXMHW"
+  };
+
+  // Αρχικοποίηση και GLOBAL db
+  firebase.initializeApp(firebaseConfig);
+  window.db = firebase.firestore();   // <— ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ
+
+  console.log("✅ Firebase συνδέθηκε!");
+  // ▶ Real-time listener τώρα που υπάρχει db
+const STATE_DOC = window.STATE_DOC || "main";
+
+window.db.collection("state").doc(STATE_DOC).onSnapshot((snap) => {
+  if (!snap.exists) return;
+  const data = snap.data();
+  Object.assign(store, data.store || {});
+  currentOp = data.currentOp || currentOp;
+  hotelsVisible = !!data.hotelsVisible;
+  globalTransfers = Array.isArray(data.globalTransfers) ? data.globalTransfers : [];
+  renderHotelsFor(currentOp);
+  console.log("🔄 Live ενημέρωση από Firestore!");
+});
+
+</script>
+</body>
+</html>
