@@ -133,6 +133,21 @@
     .menuItem b{ display:block; font-size:16px; font-weight:800; letter-spacing:.4px; }
     .menuItem span{ display:block; margin-top:6px; font-size:13px; color: var(--text-soft); }
 
+
+
+    /* Logo button in main menu (same size as other menu buttons) */
+    .logoItem{ position: relative; }
+    .logoItem .ghost{ visibility:hidden; }
+    .logoItem .menuLogo{
+      position:absolute;
+      top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      max-width:72%;
+      max-height:72%;
+      object-fit:contain;
+      pointer-events:none;
+    }
+
     .page{ flex-direction:column; padding: 18px; gap: 14px; z-index: 2; }
     .topRow{ display:flex; align-items:center; gap: 12px; }
     .backBtn{
@@ -235,7 +250,31 @@
   }
 }
 
-  </style>
+  
+/* Info titles around logo button */
+.menuInfoTitle{
+  width:260px;
+  text-align:center;
+  font-family: Manrope, system-ui, sans-serif;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:.6px;
+  color: rgba(255,255,255,.9);
+  text-shadow: 0 6px 18px rgba(0,0,0,.35);
+}
+.topInfoTitle{
+  margin-top:10px;
+  margin-bottom:-6px;
+}
+.bottomInfoTitle{
+  margin-top:-6px;
+}
+
+
+/* Clickable photos */
+.clickablePhoto{ cursor:pointer; }
+
+</style>
 </head>
 
 <body>
@@ -284,7 +323,13 @@
           <b data-i18n="kefBtn">KEFALONIA</b>
           <span data-i18n="kefSubtitle">The island</span>
         </div>
-      </div>
+      
+        <div class="menuItem logoItem" onclick="window.location.href='https://isidoras-kefalonia.gr/el/'" aria-label="Isidoras">
+          <b class="ghost" aria-hidden="true">LOGO</b>
+          <span class="ghost" aria-hidden="true">.</span>
+          <img class="menuLogo" src="assets/menu_isidoras_logo.png" data-fallback-src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20500%20200%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23ffffff%27%20stop-opacity%3D%270.85%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23ffffff%27%20stop-opacity%3D%270.45%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20x%3D%2715%27%20y%3D%2715%27%20width%3D%27470%27%20height%3D%27170%27%20rx%3D%2740%27%20fill%3D%27none%27%20stroke%3D%27%23ffffff%27%20stroke-opacity%3D%270.55%27%20stroke-width%3D%2710%27/%3E%3Ctext%20x%3D%27250%27%20y%3D%27110%27%20text-anchor%3D%27middle%27%20font-family%3D%27Manrope%2C%20system-ui%2C%20sans-serif%27%20font-size%3D%2756%27%20font-weight%3D%27800%27%20fill%3D%27url(%23g)%27%3EISIDORAS%3C/text%3E%3C/svg%3E" alt="Isidoras logo">
+        </div>
+</div>
     </section>
 
     <section class="screen page" id="page">
@@ -297,6 +342,8 @@
   </div>
 
 <script>
+const DEFAULT_PAGE = "welcome";
+
 const I18N = {
   el: {
     welcomeBtn: "Welcome",
@@ -461,9 +508,9 @@ const ABOUT_CARDS = [
     text: {
       el:"Every vacation begins with the search for the perfect place.\nThe accommodation that will fulfill the idea you have in mind for your holiday.\nThe residence that gently combines comfort, peace and a touch of luxury.\nAccomodation shouldn't be just a place. It should be an experience.",
       en:"Every vacation begins with the search for the perfect place.\nThe accommodation that will fulfill the idea you have in mind for your holiday.\nThe residence that gently combines comfort, peace and a touch of luxury.\nAccomodation shouldn't be just a place. It should be an experience.",
-      it:"Every vacation begins with the search for the perfect place.\nThe accommodation that will fulfill the idea you have in mind for your holiday.\nThe horesidencetel that gently combines comfort, peace and a touch of luxury.\nAccomodation shouldn't be just a place. It should be an experience.",
-      fr:"Every vacation begins with the search for the perfect place.\nThe accommodation that will fulfill the idea you have in mind for your holiday.\nThe hotresidenceel that gently combines comfort, peace and a touch of luxury.\nAccomodation shouldn't be just a place. It should be an experience.",
-      es:"Every vacation begins with the search for the perfect place.\nThe accommodation that will fulfill the idea you have in mind for your holiday.\nThe hotresidenceel that gently combines comfort, peace and a touch of luxury.\Accomodation shouldn't be just a place. It should be an experience."
+      it:"Every vacation begins with the search for the perfect place.\nThe accommodation that will fulfill the idea you have in mind for your holiday.\nThe residence that gently combines comfort, peace and a touch of luxury.\nAccomodation shouldn't be just a place. It should be an experience.",
+      fr:"Every vacation begins with the search for the perfect place.\nThe accommodation that will fulfill the idea you have in mind for your holiday.\nThe residence that gently combines comfort, peace and a touch of luxury.\nAccomodation shouldn't be just a place. It should be an experience.",
+      es:"Every vacation begins with the search for the perfect place.\nThe accommodation that will fulfill the idea you have in mind for your holiday.\nThe residence that gently combines comfort, peace and a touch of luxury.\nAccomodation shouldn't be just a place. It should be an experience."
     },
     img:"assets/about_studio1.jpg"
   },
@@ -639,6 +686,13 @@ photos:[
     },
     photos:[]
   }
+,
+  logo: {
+    title: { el:"ISIDORAS", en:"ISIDORAS", it:"ISIDORAS", fr:"ISIDORAS", es:"ISIDORAS" },
+    text:  { el:"", en:"", it:"", fr:"", es:"" },
+    photos:["assets/menu_isidoras_logo.png"]
+  }
+
 };
 
 const screens = {
@@ -1460,6 +1514,292 @@ document.addEventListener("click", (e)=>{
   }
 });
 
+
+
+/* ===== Photo links (auto-generated from Photo Links.txt) ===== */
+
+/* ====== Asset robustness (no broken images) ======
+   This app can run as a single standalone HTML file.
+   If an image in assets/ is missing, we replace it with a clean inline placeholder.
+*/
+const __PLACEHOLDER_SVG = (labelText="Image") => {
+  const safe = String(labelText || "Image").slice(0, 40).replace(/[<>&"]/g, "");
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ffffff" stop-opacity="0.28"/>
+          <stop offset="1" stop-color="#000000" stop-opacity="0.10"/>
+        </linearGradient>
+      </defs>
+      <rect width="1200" height="700" rx="42" fill="url(#g)"/>
+      <rect x="40" y="40" width="1120" height="620" rx="34" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="6"/>
+      <g fill="#ffffff" fill-opacity="0.88" font-family="Manrope, system-ui, sans-serif" text-anchor="middle">
+        <text x="600" y="340" font-size="46" font-weight="800">${safe}</text>
+        <text x="600" y="395" font-size="24" font-weight="600" fill-opacity="0.75">Add the correct file in assets/ to replace this</text>
+      </g>
+    </svg>
+  `.trim();
+  return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+};
+
+// Replace broken <img> sources everywhere (captures early too)
+
+document.addEventListener("error", (ev) => {
+  const el = ev.target;
+  if(!(el instanceof HTMLImageElement)) return;
+
+  // If we have a dedicated fallback (e.g., prefer PNG when available, else inline SVG), use it first.
+  const fb = el.getAttribute("data-fallback-src");
+  if(fb && el.getAttribute("src") !== fb){
+    el.dataset.fallbackApplied = "1";
+    el.setAttribute("src", fb);
+    return;
+  }
+
+  if(el.dataset.fallbackApplied === "1") return;
+  el.dataset.fallbackApplied = "1";
+
+  const alt = el.getAttribute("alt") || __basenameFromSrc(el.getAttribute("src") || "") || "Image missing";
+  el.classList.remove("clickablePhoto");
+  el.removeAttribute("role");
+  el.removeAttribute("tabindex");
+  el.setAttribute("src", __PLACEHOLDER_SVG(alt));
+}, true);
+const PHOTO_LINKS = {
+  "about_apartment1.jpg": "",
+  "about_apartment2.jpg": "",
+  "about_studio1.jpg": "",
+  "about_studio2.jpg": "",
+  "antisamos.jpg": "https://www.google.com/search?q=Antisamos+beasch+kefalonia&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n6gSh5BvUkmu3l5l0kjN8hF8TUaMQ%3A1770753308268&ei=HI2LaZyJEISmi-gPqO_HkQk&ved=0ahUKEwich7KP2s-SAxUE0wIHHaj3MZIQ4dUDCBE&uact=5&oq=Antisamos+beasch+kefalonia&gs_lp=Egxnd3Mtd2l6LXNlcnAiGkFudGlzYW1vcyBiZWFzY2gga2VmYWxvbmlhMgkQLhiABBgTGA0yCRAAGIAEGBMYDTIJEAAYgAQYExgNMggQABgTGBYYHjIIEAAYExgWGB4yCBAAGBMYFhgeMggQABgTGBYYHjIIEAAYExgWGB4yCBAAGBMYFhgeMggQABgTGBYYHjIYEC4YgAQYExgNGJcFGNwEGN4EGN8E2AEBSJchUM8DWPIfcAF4AZABAJgBvQOgAZYYqgEKMC4xMy4yLjAuMbgBA8gBAPgBAZgCEaAC5hjCAgoQABiwAxjWBBhHwgINEAAYgAQYsAMYQxiKBcICExAuGIAEGLADGEMYyAMYigXYAQHCAgUQLhiABMICCxAuGIAEGMcBGK8BwgICECbCAgQQABgewgIUEC4YgAQYlwUY3AQY3gQY3wTYAQHCAgYQABgWGB7CAgcQLhiABBgNwgINEC4YgAQYxwEYDRivAcICBhAAGA0YHsICFhAuGIAEGA0YlwUY3AQY3gQY3wTYAQHCAhwQLhiABBjHARgNGK8BGJcFGNwEGN4EGOAE2AEBwgIIEAAYExgNGB7CAgoQABgTGAUYDRgewgIHECEYoAEYCsICBBAhGBWYAwCIBgGQBhS6BgYIARABGAiSBwoxLjEzLjIuMC4xoAfE3QGyBwowLjEzLjIuMC4xuAfgGMIHBjEuMi4xNMgHNoAIAA&sclient=gws-wiz-serp",
+  "argo_rest_alati.jpg": "https://www.google.com/search?q=Alati+restaurant+alaties&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n4I4oNVD4vAikbXMy_3OoowTv41ww%3A1770753457911&ei=sY2LafitN9PGi-gPxLityAU&ved=0ahUKEwi4yt_W2s-SAxVT4wIHHURcC1kQ4dUDCBE&uact=5&oq=Alati+restaurant+alaties&gs_lp=Egxnd3Mtd2l6LXNlcnAiGEFsYXRpIHJlc3RhdXJhbnQgYWxhdGllczIHECEYoAEYCjIHECEYoAEYCjIHECEYoAEYCjIHECEYoAEYCkibKlDFBlijKXADeAGQAQCYAZ0CoAHzH6oBBjAuMjAuM7gBA8gBAPgBAZgCGqAC1CDCAgoQABiwAxjWBBhHwgIKEC4YgAQYQxiKBcICERAuGIAEGLEDGNEDGIMBGMcBwgIOEC4YgAQYsQMY0QMYxwHCAggQABiABBixA8ICCxAAGIAEGLEDGIMBwgIZEC4YgAQYQxiKBRiXBRjcBBjeBBjgBNgBAcICExAuGIAEGEMYxwEYigUYjgUYrwHCAhYQLhiABBixAxjRAxhDGIMBGMcBGIoFwgIQEC4YgAQYQxjHARiKBRivAcICERAuGIAEGLEDGIMBGMcBGK8BwgIiEC4YgAQYQxjHARiKBRiOBRivARiXBRjcBBjeBBjgBNgBAcICBRAAGIAEwgILEC4YgAQYxwEYrwHCAggQLhiABBixA8ICBRAuGIAEwgIHEAAYgAQYCsICDRAuGIAEGNEDGMcBGArCAgkQABiABBgKGAvCAgkQLhiABBgKGAvCAgYQABgWGB7CAhoQLhiABBjHARivARiXBRjcBBjeBBjgBNgBAcICCBAAGBYYChgewgIIEAAYgAQYogTCAgUQABjvBZgDAIgGAZAGCLoGBggBEAEYFJIHBjMuMTkuNKAHmdwCsgcGMC4xOS40uAfLIMIHBjEuMTguN8gHRYAIAA&sclient=gws-wiz-serp",
+  "argo_rest_alexandros.jpg": "https://www.google.com/search?sca_esv=3ef4ee282b12278c&sxsrf=ANbL-n7hTCGqdVnqTyzYT-7Tm_OXA6jH9A:1770753504710&q=Restaurant+Alexandros+myrtos+Kefalonia&sa=X&ved=2ahUKEwiK6Ift2s-SAxWA2AIHHUE2JS0Q7xYoAHoECBUQAQ&biw=1536&bih=756&dpr=1.25",
+  "argo_rest_ammos.jpg": "https://www.google.com/search?q=Restaurant+Ammos+Kefalonia&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n7O-aYsZkSdGMJoIJRPhcINqQjIHQ%3A1770753484018&ei=zI2LaaNtwJ-L6A_lhvfRDw&ved=0ahUKEwijg5nj2s-SAxXAzwIHHWXDPfoQ4dUDCBE&uact=5&oq=Restaurant+Ammos+Kefalonia&gs_lp=Egxnd3Mtd2l6LXNlcnAiGlJlc3RhdXJhbnQgQW1tb3MgS2VmYWxvbmlhMgUQABiABDIFEAAYgAQyChAAGIAEGEMYigUyChAAGIAEGEMYigUyBRAAGIAEMgUQABiABDIFEAAYgAQyChAAGIAEGEMYigUyBRAAGIAEMgUQABiABEjdD1CcBFiQDnABeAGQAQCYAZUGoAGVBqoBAzYtMbgBA8gBAPgBAZgCAqACnAbCAgoQABiwAxjWBBhHwgINEAAYgAQYsAMYQxiKBZgDAIgGAZAGCZIHBTEuNS0xoAfkBbIHAzUtMbgHmAbCBwUwLjEuMcgHBYAIAA&sclient=gws-wiz-serp",
+  "argo_rest_arxontiko.jpg": "https://www.google.com/search?q=arxontiko+&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n7bHIoO2zYMdLInGZjoRENVbTGQ2A%3A1770753402141&ei=eo2LaaalCMzsi-gPveuOiQE&ved=0ahUKEwimypO82s-SAxVM9gIHHb21IxEQ4dUDCBE&uact=5&oq=arxontiko+&gs_lp=Egxnd3Mtd2l6LXNlcnAiCmFyeG9udGlrbyAyCxAuGIAEGMcBGK8BMg0QLhiABBjHARgKGK8BMg0QLhiABBjHARgKGK8BMgUQABiABDILEC4YgAQYxwEYrwEyBRAAGIAEMgcQABiABBgKMg0QLhiABBjHARgKGK8BMgUQABiABDIHEAAYgAQYCjIaEC4YgAQYxwEYrwEYlwUY3AQY3gQY4ATYAQFItg5Q8ANYjgpwA3gBkAEAmAHmAaABmQOqAQUwLjEuMbgBA8gBAPgBAvgBAZgCBaACrAPCAgoQABiwAxjWBBhHmAMAiAYBkAYIugYGCAEQARgUkgcFMy4xLjGgB9EssgcFMC4xLjG4B6MDwgcFMC4zLjLIBw6ACAA&sclient=gws-wiz-serp",
+  "argo_rest_olea.jpg": "https://www.google.com/search?q=Restaurant+Olea+Argostoli+myrtos+Kefalonia&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n72oXfvBLamO7iWjZmGKRUs0-IRZw%3A1770753506578&ei=4o2LaeqFI4eqi-gPvoekoQo&ved=0ahUKEwjq_vnt2s-SAxUH1QIHHb4DKaQQ4dUDCBE&uact=5&oq=Restaurant+Olea+Argostoli+myrtos+Kefalonia&gs_lp=Egxnd3Mtd2l6LXNlcnAiKlJlc3RhdXJhbnQgT2xlYSBBcmdvc3RvbGkgbXlydG9zIEtlZmFsb25pYTIFEAAY7wUyBRAAGO8FMggQABiABBiiBDIFEAAY7wUyCBAAGIAEGKIESKIcUJ8GWIEacAJ4AZABAJgByQGgAfASqgEGMC4xNC4xuAEDyAEA-AEBmAIKoALtCcICChAAGLADGNYEGEfCAgYQABgNGB7CAggQABiiBBiJBcICChAhGKABGMMEGAqYAwCIBgGQBgiSBwMyLjigB5VBsgcDMC44uAfmCcIHAzEuOcgHD4AIAA&sclient=gws-wiz-serp",
+  "argo_rest_palia_plaka.jpg": "https://www.google.com/search?q=Palia+pLaka&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n4lzJxg6GBaozrUgGYRp2KIa4uEPg%3A1770753415687&ei=h42LaaLCKf6Li-gP3qPA0A8&ved=0ahUKEwjioc7C2s-SAxX-xQIHHd4REPoQ4dUDCBE&uact=5&oq=Palia+pLaka&gs_lp=Egxnd3Mtd2l6LXNlcnAiC1BhbGlhIHBMYWthMhQQLhiABBjHARgKGCoYCxiOBRivATIJEAAYgAQYChgLMgkQABiABBgKGAsyCRAAGIAEGAoYCzIJEAAYgAQYChgLMgkQABiABBgKGAsyCRAAGIAEGAoYCzIJEAAYgAQYChgLMgkQABiABBgKGAsyCRAAGIAEGAoYCzIjEC4YgAQYxwEYChgqGAsYjgUYrwEYlwUY3AQY3gQY4ATYAQJIghdQzwdYuxNwA3gBkAEAmAHWAaABzA2qAQYwLjEwLjG4AQPIAQD4AQGYAg6gAoYOwgIKEAAYsAMY1gQYR8ICDRAAGIAEGLADGEMYigXCAhMQLhiABBiwAxhDGMgDGIoF2AEBwgIZEC4YgAQYsAMYQxjHARjIAxiKBRivAdgBAcICCBAAGIAEGLEDwgIOEC4YgAQYsQMY0QMYxwHCAgsQABiABBixAxiDAcICBRAAGIAEwgIIEC4YgAQYsQPCAg4QABiABBixAxiDARiKBcICCxAuGIAEGNEDGMcBwgIOEC4YgAQYsQMYgwEYigXCAhEQLhiABBixAxjRAxiDARjHAcICCxAuGIAEGMcBGK8BwgISEC4YgAQYsQMY0QMYxwEYChgLwgIHEC4YgAQYCsICIRAuGIAEGLEDGNEDGMcBGAoYCxiXBRjcBBjeBBjgBNgBAsICGhAuGIAEGMcBGK8BGJcFGNwEGN4EGOAE2AECwgIFEC4YgATCAg4QLhiABBjHARiOBRivAcICEhAuGIAEGMcBGAoYKhiOBRivAcICBxAAGIAEGArCAggQABgWGAoYHsICBhAAGBYYHsICIRAuGIAEGMcBGAoYKhiOBRivARiXBRjcBBjeBBjgBNgBApgDAIgGAZAGC7oGBAgBGAi6BgYIAhABGBSSBwYzLjEwLjGgB96WAbIHBjAuMTAuMbgH-g3CBwYwLjQuMTDIByuACAA&sclient=gws-wiz-serp",
+  "argo_rest_sepia.jpg": "https://www.google.com/search?q=Sepia+Argostoli&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n6G4C5tTFwUdhf5rFlDo8yvn1Im9w%3A1770753446608&ei=po2LabHxJP3ui-gPyqbNgAE&ved=0ahUKEwix3K3R2s-SAxV99wIHHUpTExAQ4dUDCBE&uact=5&oq=Sepia+Argostoli&gs_lp=Egxnd3Mtd2l6LXNlcnAiD1NlcGlhIEFyZ29zdG9saTIQEC4YgAQYExjHARiOBRivATIIEAAYExgWGB4yCBAAGBMYFhgeMggQABgTGBYYHjICECYyCBAAGIAEGKIEMggQABiABBiiBDIIEAAYogQYiQUyHxAuGIAEGBMYxwEYjgUYrwEYlwUY3AQY3gQY4ATYAQFI_h9QrgZYrR5wA3gBkAEAmAGmAqABoBaqAQYwLjExLjS4AQPIAQD4AQGYAhKgAuUWwgIKEAAYsAMY1gQYR8ICChAAGIAEGEMYigXCAgoQLhiABBhDGIoFwgIOEC4YgAQYsQMY0QMYxwHCAgsQABiABBixAxiDAcICCBAAGIAEGLEDwgILEC4YgAQY0QMYxwHCAhMQLhiABBhDGMcBGIoFGI4FGK8BwgILEC4YgAQYsQMYgwHCAgsQLhiABBjHARivAcICBRAAGIAEwgIOEC4YgAQYsQMYgwEYigXCAiIQLhiABBhDGMcBGIoFGI4FGK8BGJcFGNwEGN4EGOAE2AEBwgILEAAYgAQYsQMYyQPCAg4QLhiABBiSAxjHARivAcICCxAAGIAEGJIDGIoFwgIFEC4YgATCAgYQABgWGB7CAggQABgWGAoYHpgDAOIDBRIBMSBAiAYBkAYIugYGCAEQARgUkgcGMy4xMS40oAfe7AGyBwYwLjExLjS4B9sWwgcGMC4xMS43yAczgAgA&sclient=gws-wiz-serp",
+  "argo_rest_spyros.jpg": "https://www.google.com/search?q=Spyros+Argsotoli&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n6x1C8rKOb7SURZRI6aEMXT7nDoSw%3A1770753426231&ei=ko2LacvpDYTni-gP37OzkAk&ved=0ahUKEwjL-tHH2s-SAxWE8wIHHd_ZDJIQ4dUDCBE&uact=5&oq=Spyros+Argsotoli&gs_lp=Egxnd3Mtd2l6LXNlcnAiEFNweXJvcyBBcmdzb3RvbGkyBxAAGIAEGA0yChAAGAUYChgNGB4yCBAAGAgYDRgeMggQABgIGA0YHjIIEAAYCBgNGB4yCBAAGAgYDRgeMggQABiABBiiBDIIEAAYgAQYogQyCBAAGIAEGKIEMggQABiABBiiBEjBOFC6BVjyNnADeAGQAQCYAdsBoAGJFqoBBjAuMTQuMrgBA8gBAPgBAZgCE6AC1hbCAgoQABiwAxjWBBhHwgINEAAYgAQYsAMYQxiKBcICGRAuGIAEGLADGEMYxwEYyAMYigUYrwHYAQHCAhwQLhiABBiwAxhDGMcBGMgDGIoFGI4FGK8B2AEBwgIOEC4YgAQYsQMY0QMYxwHCAgsQABiABBixAxiDAcICCBAAGIAEGLEDwgILEC4YgAQY0QMYxwHCAh0QLhiABBixAxjRAxjHARiXBRjcBBjeBBjgBNgBAsICChAuGIAEGEMYigXCAgsQLhiABBjHARivAcICGRAuGIAEGEMYigUYlwUY3AQY3gQY4ATYAQLCAgsQLhiABBixAxiDAcICBRAAGIAEwgIIEC4YgAQYsQPCAgUQLhiABMICGhAuGIAEGLEDGIMBGJcFGNwEGN4EGOAE2AECwgIaEC4YgAQYxwEYrwEYlwUY3AQY3gQY4ATYAQLCAg8QLhiABBjHARgKGAsYrwHCAgkQABiABBgKGAvCAgkQLhiABBgKGAvCAggQABgWGAoYHsICBhAAGBYYHsICBRAhGKABwgIGEAAYDRgewgIIEAAYBRgNGB7CAgoQABgIGAoYDRgemAMAiAYBkAYMugYECAEYCLoGBggCEAEYFJIHBjMuMTQuMqAHuuEBsgcGMC4xNC4yuAfJFsIHBjEuNy4xMcgHNoAIAA&sclient=gws-wiz-serp",
+  "argostoli_beach_gradakia.jpg": "https://www.google.com/search?q=gradakia+beach&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n5M1PRrB-GmmSOZ9hmqXrELw1Qndg%3A1770752685561&ei=rYqLaeX5IfeLxc8P6OHkiA0&ved=0ahUKEwilhLvm18-SAxX3RfEDHegwGdEQ4dUDCBE&uact=5&oq=gradakia+beach&gs_lp=Egxnd3Mtd2l6LXNlcnAiDmdyYWRha2lhIGJlYWNoMgsQLhiABBjHARivATIFEAAYgAQyChAAGIAEGEMYigUyBRAAGIAEMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMhoQLhiABBjHARivARiXBRjcBBjeBBjgBNgBAkiUJFCECViPInAEeAGQAQCYAa0BoAHuD6oBBDAuMTW4AQPIAQD4AQGYAhOgAsoQwgIKEAAYsAMY1gQYR8ICExAuGIAEGLADGEMYyAMYigXYAQHCAg0QABiABBixAxhDGIoFwgILEAAYgAQYsQMYgwHCAhAQABiABBixAxhDGIMBGIoFwgIWEC4YgAQYsQMY0QMYQxiDARjHARiKBcICCxAuGIAEGLEDGIMBwgIIEAAYgAQYsQPCAg0QLhiABBixAxhDGIoFwgIREC4YgAQYxwEYmAUYmQUYrwHCAhoQLhiABBixAxiDARjHARiYBRiaBRieBRivAcICHBAuGIAEGLEDGEMYigUYlwUY3AQY3gQY4ATYAQLCAhYQLhiABBhDGMcBGJgFGJkFGIoFGK8BwgIUEC4YgAQYsQMYxwEYmAUYmQUYrwHCAgoQLhiABBhDGIoFwgIOEC4YgAQYsQMYgwEYyQPCAgsQABiABBiSAxiKBcICJRAuGIAEGEMYxwEYmAUYmQUYigUYrwEYlwUY3AQY3gQY4ATYAQLCAg4QLhiABBixAxjHARivAcICHRAuGIAEGLEDGMcBGK8BGJcFGNwEGN4EGOAE2AECwgINEC4YgAQYxwEYChivAcICBRAuGIAEwgICECbCAgQQABgewgINEC4YgAQYxwEYDRivAcICBxAAGIAEGA3CAgYQABgNGB7CAhwQLhiABBjHARgNGK8BGJcFGNwEGN4EGOAE2AECmAMA4gMFEgExIECIBgGQBgy6BgQIARgIugYGCAIQARgUkgcENC4xNaAHx7kBsgcEMC4xNbgHthDCBwYwLjEuMTjIB0WACAA&sclient=gws-wiz-serp",
+  "argostoli_beach_kalamia.jpg": "https://www.google.com/search?q=kalamia+beach+lassibeach&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n6nrtZPY9dziMfEWkPQD8_amwBevg%3A1770752701947&ei=vYqLafa9OdSF7NYP74-HCA&ved=0ahUKEwi2kKPu18-SAxXUAtsEHe_HAQEQ4dUDCBE&uact=5&oq=kalamia+beach+lassibeach&gs_lp=Egxnd3Mtd2l6LXNlcnAiGGthbGFtaWEgYmVhY2ggbGFzc2liZWFjaDIIEAAYogQYiQUyCBAAGIAEGKIEMggQABiiBBiJBTIIEAAYgAQYogQyCBAAGKIEGIkFSNkxUPEKWPkvcAJ4AZABAJgBrAGgAYITqgEEMC4xObgBA8gBAPgBAZgCEqACwRDCAgoQABiwAxjWBBhHwgINEAAYgAQYsAMYQxiKBcICExAuGIAEGLADGEMYyAMYigXYAQHCAhkQLhiABBiwAxhDGMcBGMgDGIoFGK8B2AEBwgIGEAAYBxgewgIIEAAYExgHGB7CAggQABgHGAoYHsICDxAuGIAEGMcBGAoYCxivAcICCxAuGIAEGMcBGK8BwgIHEAAYgAQYCsICCRAAGIAEGAoYC8ICBRAAGIAEwgINEC4YgAQYxwEYDRivAcICBxAAGIAEGA3CAgcQLhiABBgNwgIIEAAYBxgIGB7CAhwQLhiABBjHARgNGK8BGJcFGNwEGN4EGOAE2AEBwgIGEAAYDRgewgIEECEYCpgDAIgGAZAGEboGBggBEAEYCJIHBDIuMTagB8CDAbIHBDAuMTa4B7cQwgcGMS4xMS42yActgAgA&sclient=gws-wiz-serp",
+  "argostoli_beach_makris_gialos.jpg": "https://www.google.com/search?q=makris+gialos+kefalonia&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n6FlTQteRtyOIA83w0PKv_evqvEQg%3A1770752625738&ei=cYqLaerZLMmI7NYP07Dd8QI&ved=0ahUKEwiq1vfJ18-SAxVJBNsEHVNYNy4Q4dUDCBE&uact=5&oq=makris+gialos+kefalonia&gs_lp=Egxnd3Mtd2l6LXNlcnAiF21ha3JpcyBnaWFsb3Mga2VmYWxvbmlhMgUQLhiABDICECYyBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMhQQLhiABBiXBRjcBBjeBBjfBNgBAUjrEVCaA1i-EHABeAGQAQCYAbgBoAHzCqoBBDAuMTC4AQPIAQD4AQGYAgugAqoLwgIKEAAYsAMY1gQYR8ICDRAAGIAEGLADGEMYigXCAhMQLhiABBiwAxhDGMgDGIoF2AEBwgIFEAAYgATCAgoQABiABBhDGIoFwgIIEAAYFhgKGB6YAwCIBgGQBhS6BgYIARABGAiSBwQxLjEwoAe5igGyBwQwLjEwuAekC8IHBDItMTHIByuACAA&sclient=gws-wiz-serp",
+  "argostoli_beach_platis_gialos.jpg": "https://www.google.com/search?q=platigialos+kefalonia&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n5NzieBXjtRdoTNa9xHIpZSEsbdjw%3A1770752630362&ei=doqLae7qFefkxc8PtNC9sQU&ved=0ahUKEwju_ZHM18-SAxVncvEDHTRoL1YQ4dUDCBE&uact=5&oq=platigialos+kefalonia&gs_lp=Egxnd3Mtd2l6LXNlcnAiFXBsYXRpZ2lhbG9zIGtlZmFsb25pYTIGEAAYBxgeMgYQABgHGB4yBhAAGAcYHjIGEAAYBxgeMggQABgHGAgYHjIIEAAYBxgIGB4yCBAAGAcYCBgeMggQABgHGAgYHjIIEAAYBxgIGB4yCBAAGAcYCBgeSMAPUIAIWIwNcAJ4AJABAJgBowGgAfoFqgEDMC42uAEDyAEA-AEBmAIGoAKPBMICChAAGLADGNYEGEfCAhMQLhiABBiwAxhDGMgDGIoF2AEBmAMAiAYBkAYLugYECAEYCJIHAzIuNKAHpj-yBwMwLjS4B4UEwgcHMC4zLjIuMcgHHoAIAA&sclient=gws-wiz-serp",
+  "argostoli_botanical.jpg": "https://www.google.com/search?q=argostoli+botanical+&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n6IvQ6CpWE_zMthiRP5wQ6A0eONow%3A1770752762647&ei=-oqLaeGSJ_moxc8PyKSfoQo&ved=0ahUKEwjh95uL2M-SAxV5VPEDHUjSJ6QQ4dUDCBE&uact=5&oq=argostoli+botanical+&gs_lp=Egxnd3Mtd2l6LXNlcnAiFGFyZ29zdG9saSBib3RhbmljYWwgMgYQABgWGB4yBRAAGO8FMggQABiiBBiJBTIFEAAY7wUyBRAAGO8FMgUQABjvBUjIKlCaBFiiJnABeAGQAQGYAdgBoAG7FKoBBjAuMjAuMbgBA8gBAPgBAZgCD6ACkQ7CAgoQABiwAxjWBBhHwgIHECEYoAEYCsICBRAAGIAEwgIFEC4YgATCAgIQJsICCBAAGBYYChgewgILEC4YgAQYxwEYrwHCAgcQABiABBgKwgIREC4YgAQYxwEYmAUYmQUYrwHCAhoQLhiABBjHARivARiXBRjcBBjeBBjgBNgBAcICDhAuGIAEGMcBGJgFGK8BwgIdEC4YgAQYxwEYmAUYrwEYlwUY3AQY3gQY4ATYAQHCAgcQABiABBgNwgIGEAAYDRgewgINEC4YgAQYExjHARivAcICCBAAGBMYFhgewgIIEAAYgAQYogTCAhwQLhiABBgTGMcBGK8BGJcFGNwEGN4EGOAE2AEBmAMAiAYBkAYIugYGCAEQARgUkgcEMS4xNKAHoJQBsgcEMC4xNLgHjg7CBwYwLjExLjTIBySACAA&sclient=gws-wiz-serp",
+  "argostoli_bridge.jpg": "https://www.google.com/search?sca_esv=3ef4ee282b12278c&sxsrf=ANbL-n65aX191hvYuMM50s292sZG-PkSjA:1770752745356&q=De+bosset+bridge+%CE%B1%CF%81%CE%B3%CE%BF%CF%83%CF%84%CE%BF%CE%BB%CE%B9&spell=1&sa=X&ved=2ahUKEwiky_yC2M-SAxXRS_EDHcP1CrsQBSgAegQIDRAB&biw=1536&bih=756&dpr=1.25",
+  "argostoli_lagoon.jpg": "https://www.google.com/search?q=argostoli+lagoon&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n60cBPUiiCYenYyRSssqSWxsfl5BA%3A1770752783126&ei=D4uLaai2B9WFxc8P3s3BmQI&ved=0ahUKEwjo-f2U2M-SAxXVQvEDHd5mMCMQ4dUDCBE&uact=5&oq=argostoli+lagoon&gs_lp=Egxnd3Mtd2l6LXNlcnAiEGFyZ29zdG9saSBsYWdvb24yBxAuGIAEGBMyCBAAGBMYFhgeMggQABgTGBYYHjIIEAAYExgWGB4yCBAAGBMYFhgeMgoQABgTGBYYChgeMgIQJjICECYyBRAAGO8FMggQABiiBBiJBTIWEC4YgAQYExiXBRjcBBjeBBjgBNgBAUjeFVC7CVjbE3ACeAGQAQCYAZcBoAGJBqoBAzAuNrgBA8gBAPgBAZgCCKACqgbCAgoQABiwAxjWBBhHwgIFEAAYgATCAgUQLhiABMICCBAAGBYYChgewgIGEAAYFhgewgIJEC4YgAQYExgNwgIKEAAYExgIGA0YHsICGBAuGIAEGBMYDRiXBRjcBBjeBBjgBNgBAZgDAIgGAZAGCLoGBggBEAEYFJIHAzIuNqAH_jCyBwMwLja4B6EGwgcFMC40LjTIBxeACAA&sclient=gws-wiz-serp",
+  "argostoli_library.jpg": "https://www.google.com/search?q=argostoli+library&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n5JPk5RXRvaSEe8ALS4uT5xItpc5w%3A1770752794189&ei=GouLadKaC7jUxc8P5LSu8QM&ved=0ahUKEwjSj6Ga2M-SAxU4avEDHWSaKz4Q4dUDCBE&uact=5&oq=argostoli+library&gs_lp=Egxnd3Mtd2l6LXNlcnAiEWFyZ29zdG9saSBsaWJyYXJ5MggQABgWGAoYHjIGEAAYFhgeMgYQABgWGB4yCBAAGKIEGIkFMggQABiiBBiJBTIIEAAYgAQYogQyCBAAGIAEGKIEMgUQABjvBUiWE1D4B1iVEXACeAGQAQCYAdMBoAGtCKoBBTAuNi4xuAEDyAEA-AEBmAIJoALRCMICChAAGLADGNYEGEfCAgUQABiABMICBRAuGIAEwgICECaYAwCIBgGQBgiSBwUyLjYuMaAHtS-yBwUwLjYuMbgHywjCBwUwLjYuM8gHGIAIAA&sclient=gws-wiz-serp",
+  "argostoli_lighthouse.jpg": "https://www.google.com/search?q=argostoli+light+house&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n7JxdQ4H9roVkE7lhfO9e4WROkOEg%3A1770752746829&ei=6oqLafCbMouTxc8PlMjv-Qg&ved=0ahUKEwjwuNaD2M-SAxWLSfEDHRTkO48Q4dUDCBE&uact=5&oq=argostoli+light+house&gs_lp=Egxnd3Mtd2l6LXNlcnAiFWFyZ29zdG9saSBsaWdodCBob3VzZTIHECEYoAEYCjIHECEYoAEYCjIHECEYoAEYCjIHECEYoAEYCjIEECEYFUiVIlC3B1igIXADeAGQAQGYAbsCoAH4F6oBCDAuMTcuMi4xuAEDyAEA-AEBmAIWoALEF8ICChAAGLADGNYEGEfCAhEQLhiABBixAxjRAxiDARjHAcICChAuGIAEGEMYigXCAg4QLhiABBixAxjRAxjHAcICCBAAGIAEGLEDwgILEAAYgAQYsQMYgwHCAiAQLhiABBixAxjRAxiDARjHARiXBRjcBBjeBBjgBNgBAcICCBAuGIAEGLEDwgIFEAAYgATCAgoQABiABBhDGIoFwgIZEC4YgAQYQxiKBRiXBRjcBBjeBBjgBNgBAcICBRAuGIAEwgISEC4YgAQYsQMY0QMYxwEYChgLwgIQEC4YgAQYsQMYQxiDARiKBcICDRAuGIAEGLEDGEMYigXCAgsQLhiABBjHARivAcICBxAAGIAEGArCAhEQLhiABBjHARiYBRiZBRivAcICFBAuGIAEGJcFGNwEGN4EGOAE2AEBwgIaEC4YgAQYxwEYrwEYlwUY3AQY3gQY4ATYAQHCAgIQJsICCBAAGBYYChgewgIGEAAYFhgewgIFEAAY7wXCAggQABiiBBiJBcICCBAAGIAEGKIEwgIFECEYnwXCAgUQIRigAZgDAIgGAZAGCLoGBggBEAEYFJIHCDMuMTYuMi4xoAex_AGyBwgwLjE2LjIuMbgHuhfCBwcwLjEyLjEwyAc8gAgA&sclient=gws-wiz-serp",
+  "close_map.jpg": "",
+  "close_rest_captain_nikolas.jpg": "https://www.google.com/search?q=Restaurant+Captain+Nikolas+kefalonia&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n6DbsxrpYBXgFFpdjnUnGLsZcXVvg%3A1770753554620&ei=Eo6LabDJJcqK-d8Po8SDuAs&ved=0ahUKEwiwmu6E28-SAxVKRf4FHSPiALcQ4dUDCBE&uact=5&oq=Restaurant+Captain+Nikolas+kefalonia&gs_lp=Egxnd3Mtd2l6LXNlcnAiJFJlc3RhdXJhbnQgQ2FwdGFpbiBOaWtvbGFzIGtlZmFsb25pYTIGEAAYFhgeMggQABiABBiiBDIFEAAY7wUyBRAAGO8FMggQABiABBiiBEjgaFDBGVijZ3AIeAGQAQCYAdYBoAHsMqoBBjAuMzYuM7gBA8gBAPgBAZgCL6AC_DPCAgoQABiwAxjWBBhHwgIIEAAYgAQYsQPCAgsQLhiABBixAxiDAcICCxAAGIAEGLEDGIMBwgIOEC4YgAQYsQMY0QMYxwHCAggQLhiABBixA8ICDhAuGIAEGLEDGIMBGIoFwgIREC4YgAQYsQMY0QMYgwEYxwHCAgUQABiABMICChAAGIAEGEMYigXCAgsQABiABBiSAxiKBcICDRAAGIAEGEMYyQMYigXCAg0QABiABBixAxhDGIoFwgILEC4YgAQYxwEYrwHCAggQABgWGAoYHsICBxAAGIAEGBPCAggQABgTGBYYHsICChAAGBMYFhgKGB7CAgoQABgIGAoYDRgewgIIEAAYCBgNGB7CAggQABiiBBiJBZgDAIgGAZAGCJIHBjguMzYuM6AHh-wBsgcGMC4zNi4zuAfmM8IHBjAuNDUuMsgHX4AIAA&sclient=gws-wiz-serp",
+  "close_rest_kemeza.jpg": "https://www.google.com/search?q=Remetzo+Restaurant+kefalonia&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n5F1bOTS94QXy85CmqwT41bOH6OOQ%3A1770753603734&ei=Q46LacPGLOuP-d8Pz_GjyAg&ved=0ahUKEwiD9KOc28-SAxXrR_4FHc_4CIkQ4dUDCBE&uact=5&oq=Remetzo+Restaurant+kefalonia&gs_lp=Egxnd3Mtd2l6LXNlcnAiHFJlbWV0em8gUmVzdGF1cmFudCBrZWZhbG9uaWEyBBAAGEcyBBAAGEcyBBAAGEcyBBAAGEcyBBAAGEcyBBAAGEcyBBAAGEcyBBAAGEdI5RNQ5hFY9hJwAHgDkAEAmAEAoAEAqgEAuAEDyAEA-AEBmAICoAIKmAMA4gMFEgExIECIBgGQBgiSBwEyoAcAsgcAuAcAwgcDMi0yyAcIgAgA&sclient=gws-wiz-serp",
+  "close_rest_vatsa.jpg": "https://www.google.com/search?q=Restaurant+vatsa+kefalonia&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n4bElNfRZRLMVbYK-EuL1GEN6SPng%3A1770753548390&ei=DI6LafjKF8qK-d8Po8SDuAs&ved=0ahUKEwj4gPKB28-SAxVKRf4FHSPiALcQ4dUDCBE&uact=5&oq=Restaurant+vatsa+kefalonia&gs_lp=Egxnd3Mtd2l6LXNlcnAiGlJlc3RhdXJhbnQgdmF0c2Ega2VmYWxvbmlhMgYQABgWGB4yCBAAGKIEGIkFMggQABiABBiiBDIIEAAYogQYiQUyBRAAGO8FSJYaUKkNWOkYcAJ4AZABAJgBrgKgAZgOqgEHMC43LjIuMbgBA8gBAPgBAZgCDKACvQ7CAgoQABiwAxjWBBhHwgINEC4YgAQYxwEYDRivAcICBxAAGIAEGA3CAgYQABgNGB7CAhwQLhiABBjHARgNGK8BGJcFGNwEGN4EGOAE2AEBwgIIEAAYCBgNGB6YAwCIBgGQBgi6BgYIARABGBSSBwcyLjcuMi4xoAeIK7IHBzAuNy4yLjG4B7cOwgcGMC4xMS4xyAcXgAgA&sclient=gws-wiz-serp",
+  "fteri.jpg": "https://www.google.com/search?q=Fteri+Beach+Kefalonia&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n6O7dr8vbXxQhBCslTtMYl6ov5uPQ%3A1770753315766&ei=I42Ladm2LoOgi-gPyIy12As&ved=0ahUKEwiZ1PuS2s-SAxUD0AIHHUhGDbsQ4dUDCBE&uact=5&oq=Fteri+Beach+Kefalonia&gs_lp=Egxnd3Mtd2l6LXNlcnAiFUZ0ZXJpIEJlYWNoIEtlZmFsb25pYTIFEC4YgAQyBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yFBAuGIAEGJcFGNwEGN4EGN8E2AEBSIw4UMoHWMg2cAJ4BJABAJgBnAKgAYIdqgEGMC4yMS4yuAEDyAEA-AEBmAIcoAL5HcICBBAAGEfCAgoQLhiABBhDGIoFwgIREC4YgAQYsQMY0QMYgwEYxwHCAgoQABiABBhDGIoFwgILEAAYgAQYsQMYgwHCAggQABiABBixA8ICGRAuGIAEGEMYigUYlwUY3AQY3gQY3wTYAQHCAhAQLhiABBixAxhDGIMBGIoFwgIQEAAYgAQYsQMYQxiDARiKBcICBRAAGIAEwgIfEC4YgAQYsQMYQxiDARiKBRiXBRjcBBjeBBjfBNgBAcICCxAuGIAEGMcBGK8BwgIHEAAYgAQYCsICCxAuGIAEGLEDGIMBwgIaEC4YgAQYsQMYgwEYlwUY3AQY3gQY3wTYAQGYAwDiAwUSATEgQIgGAZAGCLoGBggBEAEYFJIHBjUuMjEuMqAH_MYCsgcGMC4yMS4yuAfmHcIHBjAuNi4yMsgHWYAIAA&sclient=gws-wiz-serp",
+  "kef_assos.jpg": "https://www.google.com/search?q=Asso+Vilage&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n7BCv89bN_BewK6vK51ZDjUoBfk6A%3A1770753224117&ei=yIyLacz2BvOci-gPu86ToAk&ved=0ahUKEwjM-qHn2c-SAxVzzgIHHTvnBJQQ4dUDCBE&uact=5&oq=Asso+Vilage&gs_lp=Egxnd3Mtd2l6LXNlcnAiC0Fzc28gVmlsYWdlMgYQABgNGB4yCBAAGAgYDRgeMggQABgIGA0YHjIIEAAYCBgNGB4yBhAAGA0YHjIGEAAYDRgeMgYQABgNGB4yCBAAGAgYDRgeMggQABgIGA0YHjIIEAAYCBgNGB5IvShQ4QhYiCdwBngBkAEAmAGEAqAB5hWqAQYwLjEyLjO4AQPIAQD4AQGYAhWgAsEWwgIKEAAYsAMY1gQYR8ICExAuGIAEGLADGEMYyAMYigXYAQHCAhkQLhiABBiwAxhDGMcBGMgDGIoFGK8B2AEBwgIKEC4YgAQYQxiKBcICERAuGIAEGLEDGNEDGIMBGMcBwgIOEC4YgAQYsQMY0QMYxwHCAggQABiABBixA8ICCxAAGIAEGLEDGIMBwgIZEC4YgAQYQxiKBRiXBRjcBBjeBBjgBNgBAcICChAAGIAEGEMYigXCAgUQABiABMICCxAuGIAEGMcBGK8BwgIFEC4YgATCAg4QLhiABBixAxiDARiKBcICHRAuGIAEGLEDGNEDGMcBGJcFGNwEGN4EGOAE2AEBwgISEC4YgAQYsQMY0QMYxwEYChgLwgIPEAAYgAQYsQMYgwEYChgLwgIHEC4YgAQYCsICCRAAGIAEGAoYC8ICDxAuGIAEGMcBGAoYCxivAcICEBAuGIAEGLEDGIMBGIoFGArCAiEQLhiABBixAxjRAxjHARgKGAsYlwUY3AQY3gQY4ATYAQHCAgsQLhiABBjRAxjHAcICERAuGIAEGLEDGIMBGMcBGK8BwgIHEAAYgAQYCsICIBAuGIAEGLEDGIMBGMcBGK8BGJcFGNwEGN4EGOAE2AEBwgIGEAAYFhgewgIHEAAYgAQYDcICBxAAGIAEGBPCAgkQABiABBgTGA2YAwCIBgGQBg26BgYIARABGAiSBwU2LjkuNqAHsqwBsgcFMC45Lja4B6UWwgcHMC4xMC4xMcgHQ4AIAA&sclient=gws-wiz-serp",
+  "kef_drogarati.jpg": "https://www.google.com/search?q=Drogarati&sca_esv=3ef4ee282b12278c&sxsrf=ANbL-n6VTTz2SDRQjCYfC2QywhP4feqd2w%3A1770753213719&ei=vYyLab3OK_L9i-gPpPOMoAw&biw=1536&bih=756&ved=0ahUKEwj9oKfi2c-SAxXy_gIHHaQ5A8QQ4dUDCBE&uact=5&oq=Drogarati&gs_lp=Egxnd3Mtd2l6LXNlcnAiCURyb2dhcmF0aTIQEC4YgAQYQxjHARiKBRivATIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgoQABiABBhDGIoFMgUQABiABDIFEAAYgAQyCxAuGIAEGMcBGK8BMh8QLhiABBhDGMcBGIoFGK8BGJcFGNwEGN4EGOAE2AEBSNgTUNEGWP4RcAN4AZABAJgB1gWgAfMQqgELMi0xLjAuMS4wLjK4AQPIAQD4AQGYAgegApIRwgIKEAAYsAMY1gQYR8ICCxAAGIAEGLEDGIMBwgIOEC4YgAQYsQMY0QMYxwHCAhEQLhiABBixAxjRAxiDARjHAcICCBAuGIAEGLEDwgIIEAAYgAQYsQPCAgsQLhiABBixAxiDAZgDAIgGAZAGCLoGBggBEAEYFJIHCzMuMC4xLjAuMS4yoAfkOLIHCTItMS4wLjEuMrgHhxHCBwUwLjMuNMgHGIAIAA&sclient=gws-wiz-serp",
+  "kef_fiskardo.jpg": "https://www.google.com/search?q=Fiskardo+Village&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n6Lw-wC5OBmDII6H2A3LHFk8-5Gzg%3A1770753258895&ei=6oyLacGfNuuli-gPo-eE8AI&ved=0ahUKEwjBvOz32c-SAxXr0gIHHaMzAS4Q4dUDCBE&uact=5&oq=Fiskardo+Village&gs_lp=Egxnd3Mtd2l6LXNlcnAiEEZpc2thcmRvIFZpbGxhZ2UyCBAAGBMYBxgeMggQABgTGAcYHjIIEC4YExgHGB4yChAAGBMYBxgIGB4yChAAGBMYCBgNGB4yCBAAGIAEGKIEMgUQABjvBTIIEAAYgAQYogQyCBAAGIAEGKIEMgUQABjvBUi6FlDtB1itFXAAeAOQAQCYAZcBoAHtCKoBAzAuOLgBA8gBAPgBAZgCB6AC6wXCAgQQABhHwgIGEAAYBxgewgIIEAAYBxgKGB7CAhIQLhiABBixAxjRAxjHARgKGAvCAgwQABiABBixAxgKGAuYAwDiAwUSATEgQIgGAZAGCJIHAzIuNaAHnTqyBwMwLjW4B-MFwgcFMC42LjHIBxGACAA&sclient=gws-wiz-serp",
+  "kef_melissani.jpg": "https://www.google.com/search?q=melisani+kefalonia&oq=melisani+kefalonia&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQIRiPAjIHCAIQIRiPAtIBCDI5NDFqMGo0qAIAsAIB&sourceid=chrome&ie=UTF-8",
+  "lixouri_beach_aia_eleni.jpg": "https://www.google.com/search?q=agia+eleni+beach&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n4sCQ2ioPDcox8mn4iEdkOqK_Scsw%3A1770752971926&ei=y4uLaf-hOIyti-gPtcvS4Qg&ved=0ahUKEwi_s4Hv2M-SAxWM1gIHHbWlNIwQ4dUDCBE&uact=5&oq=agia+eleni+beach&gs_lp=Egxnd3Mtd2l6LXNlcnAiEGFnaWEgZWxlbmkgYmVhY2gyBRAAGIAEMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeSOYcUNoEWIEbcAF4A5ABAJgB9AGgAfcVqgEGMC4xMy40uAEDyAEA-AEBmAIUoALRFsICBBAAGEfCAhEQLhiABBixAxjRAxiDARjHAcICDhAuGIAEGLEDGNEDGMcBwgIKEC4YgAQYQxiKBcICCBAAGIAEGLEDwgILEAAYgAQYsQMYgwHCAiAQLhiABBixAxjRAxiDARjHARiXBRjcBBjeBBjgBNgBAcICCxAuGIAEGLEDGIMBwgIIEC4YgAQYsQPCAgUQLhiABMICBBAAGAPCAhoQLhiABBixAxiDARiXBRjcBBjeBBjgBNgBAcICCxAuGIAEGMcBGK8BwgIHEAAYgAQYCsICFBAuGIAEGJcFGNwEGN4EGN8E2AEBwgIHEC4YgAQYCsICCBAAGBYYChgewgIPEC4YgAQYxwEYChgLGK8BwgIJEC4YgAQYChgLwgIJEAAYgAQYChgLwgIREC4YgAQYxwEYChgqGAsYrwHCAiAQLhiABBjHARgKGCoYCxivARiXBRjcBBjeBBjgBNgBAcICBxAAGIAEGA3CAgYQABgNGB6YAwDiAwUSATEgQIgGAZAGCLoGBggBEAEYFJIHBjMuMTMuNKAHvpUCsgcGMC4xMy40uAfGFsIHBjAuOC4xMsgHQ4AIAA&sclient=gws-wiz-serp",
+  "lixouri_beach_lagadakia.jpg": "https://www.google.com/search?q=lahadakia&sca_esv=3ef4ee282b12278c&sxsrf=ANbL-n6lHIAvRVdFg3_K0zUJzWBpK9KLOg%3A1770752949125&ei=tYuLacGlB8uUxc8Px6uR-A0&biw=1536&bih=756&ved=0ahUKEwiB1JHk2M-SAxVLSvEDHcdVBN8Q4dUDCBE&uact=5&oq=lahadakia&gs_lp=Egxnd3Mtd2l6LXNlcnAiCWxhaGFkYWtpYTILEC4YgAQYChgqGA0yBhAAGA0YHjIGEAAYDRgeMggQABgKGA0YHjIIEAAYChgNGB4yBhAAGA0YHjIGEAAYDRgeMggQABgKGA0YHjIGEAAYDRgeMgYQABgNGB4yGhAuGIAEGAoYKhgNGJcFGNwEGN4EGOAE2AEBSIgbUMAJWL4VcAB4BJABAJgB3QOgAfAOqgEJMC42LjEuMS4xuAEDyAEA-AEBmAIMoAKmD8ICBBAAGEfCAhEQLhiABBixAxjRAxiDARjHAcICChAAGIAEGEMYigXCAggQABiABBixA8ICBRAAGIAEwgILEAAYgAQYsQMYgwHCAg4QLhiABBixAxjRAxjHAcICIBAuGIAEGLEDGNEDGIMBGMcBGJcFGNwEGN4EGOAE2AEBwgIQEC4YgAQYQxjHARiKBRivAcICChAuGIAEGEMYigXCAhYQLhiABBhDGMcBGJgFGJkFGIoFGK8BwgILEC4YgAQYsQMYgwHCAgUQLhiABMICHxAuGIAEGEMYxwEYigUYrwEYlwUY3AQY3gQY4ATYAQHCAgcQABiABBgKwgIJEAAYgAQYChgqwgIHEC4YgAQYCsICBBAAGB7CAhQQLhiABBiXBRjcBBjeBBjgBNgBAcICBxAuGIAEGBPCAgcQABiABBgTwgIJEC4YgAQYExgKwgIJEAAYgAQYExgKwgIWEC4YgAQYExiXBRjcBBjeBBjfBNgBAcICCRAAGIAEGBMYDcICCBAAGBMYDRgewgIKEAAYExgKGA0YHpgDAOIDBRIBMSBAiAYBkAYIugYGCAEQARgUkgcJMy42LjEuMS4xoAfxbrIHCTAuNi4xLjEuMbgHnA_CBwUwLjUuN8gHKYAIAA&sclient=gws-wiz-serp",
+  "lixouri_beach_petani.jpg": "https://www.google.com/search?q=petani+beach&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n7xg2T7hvUk0EdIEUSzo6XbR78EgQ%3A1770752986685&ei=2ouLaYPIKfXai-gP5b2A4AI&ved=0ahUKEwiDnYb22M-SAxV17QIHHeUeACwQ4dUDCBE&uact=5&oq=petani+beach&gs_lp=Egxnd3Mtd2l6LXNlcnAiDHBldGFuaSBiZWFjaDIKEC4YgAQYQxiKBTILEC4YgAQYxwEYrwEyBRAAGIAEMgIQJjIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIZEC4YgAQYQxiKBRiXBRjcBBjeBBjgBNgBAUjUF1C2CVjbFXADeAGQAQGYAasBoAG3DaoBBDAuMTK4AQPIAQD4AQGYAg6gAtUMwgIKEAAYsAMY1gQYR8ICDRAAGIAEGLADGEMYigXCAhMQLhiABBiwAxhDGMgDGIoF2AEBwgIIEAAYgAQYsQPCAg4QLhiABBixAxjRAxjHAcICCxAAGIAEGLEDGIMBwgIQEC4YgAQYQxjHARiKBRivAcICGRAuGIAEGEMYigUYlwUY3AQY3gQY3wTYAQHCAhYQLhiABBhDGMcBGJgFGJkFGIoFGK8BwgIKEAAYgAQYQxiKBcICFhAuGIAEGLEDGNEDGIMBGMcBGIoFGArCAgsQLhiABBixAxiDAcICJRAuGIAEGEMYxwEYmAUYmQUYigUYrwEYlwUY3AQY3gQY4ATYAQHCAg4QABiABBixAxiDARiKBcICFBAuGIAEGLEDGIMBGMcBGIoFGK8BwgILEAAYgAQYsQMYigXCAhEQLhiABBjHARiYBRiaBRivAcICERAuGIAEGMcBGJgFGJkFGK8BwgIFEC4YgATCAiAQLhiABBjHARiYBRiZBRivARiXBRjcBBjeBBjgBNgBAZgDAIgGAZAGE7oGBggBEAEYCJIHBDMuMTGgB-SyAbIHBDAuMTG4B8YMwgcGMC4zLjExyAc0gAgA&sclient=gws-wiz-serp",
+  "lixouri_beach_xi_megas_lakkos.jpg": "https://kefaloniageopark.gr/en/node/554",
+  "lixouri_kipoureon.jpg": "https://www.google.com/search?sca_esv=3ef4ee282b12278c&sxsrf=ANbL-n4XIuINKVK6o_On7dKW6aeVAqGGHw:1770753034869&q=kipoureon+monastery&sa=X&ved=2ahUKEwjIiION2c-SAxXH3gIHHdUUMNsQ7xYoAHoECA8QAQ&biw=1536&bih=756&dpr=1.25",
+  "lixouri_laskaratos.jpg": "https://www.tripadvisor.com.gr/Attraction_Review-g651972-d11445333-Reviews-Statue_of_Andreas_Laskaratos-Lixouri_Kefalonia_Ionian_Islands.html",
+  "lixouri_lighthouse.jpg": "https://www.google.com/search?q=lkefalonia+light+house+gero+gobos&oq=lkefalonia+light+house+gero+gobos&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIJCAEQIRgKGKABMgkIAhAhGAoYoAEyBwgDECEYjwIyBwgEECEYjwLSAQkxMjU4MWowajSoAgCwAgA&sourceid=chrome&ie=UTF-8",
+  "lixouri_pantokrator.jpg": "https://www.google.com/search?q=%CE%B5%CE%BA%CE%BA%CE%BB%CE%B7%CF%83%CE%B9%CE%B1+%CF%80%CE%B1%CE%BD%CF%84%CE%BF%CE%BA%CF%81%CE%B1%CF%84%CE%BF%CF%81%CE%B1+%CE%BB%CE%B7%CE%BE%CE%BF%CF%85%CF%81%CE%B9&sca_esv=3ef4ee282b12278c&sxsrf=ANbL-n7hZ8tgYvnL7bGv1vE1bA0mylg7ZQ:1770753135519&source=lnms&sa=X&ved=2ahUKEwi6p4K92c-SAxV4ygIHHbCtH8QQ0pQJegQIAhAG&biw=1536&bih=756&dpr=1.25",
+  "lixouri_square.jpg": "https://www.google.com/search?q=lixouri+square&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n5dsSfkenx7kt4uQX6Z8LjNlQGOAw%3A1770753063426&ei=J4yLaYm7GY_ri-gPneXgwQg&ved=0ahUKEwjJ6tGa2c-SAxWP9QIHHZ0yOIgQ4dUDCBE&uact=5&oq=lixouri+square&gs_lp=Egxnd3Mtd2l6LXNlcnAiDmxpeG91cmkgc3F1YXJlMgQQABgeMgYQABgIGB4yBhAAGAgYHjIGEAAYCBgeMgYQABgIGB4yBhAAGAgYHjIGEAAYCBgeMgYQABgIGB4yCBAAGIAEGKIEMggQABiABBiiBEiAD1D3BliqDHABeAGQAQCYAcABoAHjA6oBAzAuM7gBA8gBAPgBAZgCBKAC7wPCAgoQABiwAxjWBBhHwgIKECEYoAEYwwQYCsICCRAAGIAEGBMYDcICChAAGBMYCBgNGB6YAwDiAwUSATEgQIgGAZAGApIHAzEuM6AH_g-yBwMwLjO4B-wDwgcDMS4zyAcHgAgA&sclient=gws-wiz-serp",
+  "myrtos.jpg": "https://www.google.com/search?q=Myrtos+beach&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n6uz19r-4eWGVJ18I3l3unynnR0xQ%3A1770753270514&ei=9oyLaeqHH8rLi-gP4_mR-Q0&ved=0ahUKEwjq2rH92c-SAxXK5QIHHeN8JN8Q4dUDCBE&uact=5&oq=Myrtos+beach&gs_lp=Egxnd3Mtd2l6LXNlcnAiDE15cnRvcyBiZWFjaDIFEC4YgAQyBRAAGIAEMgsQLhiABBjHARivATICECYyBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yFBAuGIAEGJcFGNwEGN4EGOAE2AEBSO8aUK0HWJsZcAN4AZABAJgB0wSgAcsYqgELMC41LjQuMS4xLjG4AQPIAQD4AQGYAg-gAogZwgIKEAAYsAMY1gQYR8ICChAuGIAEGEMYigXCAgsQABiABBixAxiDAcICGRAuGIAEGEMYigUYlwUY3AQY3gQY4ATYAQHCAgoQABiABBhDGIoFwgIIEAAYgAQYsQPCAg4QABiABBixAxiDARiKBcICERAuGIAEGMcBGJgFGJkFGK8BwgIOEC4YgAQYxwEYmAUYrwGYAwCIBgGQBgi6BgYIARABGBSSBwszLjQuNS4xLjEuMaAHl80BsgcLMC40LjUuMS4xLjG4B_4YwgcFMC42LjnIBy6ACAA&sclient=gws-wiz-serp",
+  "rest_comidora.jpg": "https://www.google.com/search?q=Comidoro+restaurant+lixouri&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n4kTCphvDhpFwHm_Th0f050mzBcVg%3A1770753334819&ei=No2LadvcMcqNi-gPm96EwAg&ved=0ahUKEwjbz4ac2s-SAxXKxgIHHRsvAYgQ4dUDCBE&uact=5&oq=Comidoro+restaurant+lixouri&gs_lp=Egxnd3Mtd2l6LXNlcnAiG0NvbWlkb3JvIHJlc3RhdXJhbnQgbGl4b3VyaTIGEAAYFhgeMgUQABjvBTIIEAAYgAQYogQyBRAAGO8FMggQABiABBiiBDIIEAAYgAQYogRIokJQjgtYw0BwBHgBkAEBmAGKAqABhSWqAQYwLjI0LjS4AQPIAQD4AQGYAh-gAt4jwgIKEAAYsAMY1gQYR8ICExAuGIAEGLADGEMYyAMYigXYAQHCAgoQLhiABBhDGIoFwgIKEAAYgAQYQxiKBcICCBAAGIAEGLEDwgILEAAYgAQYsQMYgwHCAhEQLhiABBixAxjRAxiDARjHAcICDhAAGIAEGLEDGIMBGIoFwgIZEC4YgAQYQxiKBRiXBRjcBBjeBBjgBNgBAcICBRAAGIAEwgIOEC4YgAQYsQMY0QMYxwHCAg4QLhiABBjHARiOBRivAcICCxAuGIAEGMcBGK8BwgIHEAAYgAQYCsICHRAuGIAEGMcBGI4FGK8BGJcFGNwEGN4EGOAE2AEBwgINEC4YgAQY0QMYxwEYCsICBhAAGAoYHsICBBAAGB7CAggQABgWGAoYHsICAhAmwgIHECEYoAEYCsICCBAAGKIEGIkFmAMAiAYBkAYQugYGCAEQARgIkgcGNC4yNC4zoAeqmgGyBwYwLjI0LjO4B80jwgcGMC4yNS42yAdFgAgA&sclient=gws-wiz-serp",
+  "rest_gefyra.jpg": "https://www.google.com/search?q=Gefyra+restaurant+lixouri&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n7008QBPEM7YQ9rh3xyh329e3dOAg%3A1770753359167&ei=T42LaZT1Cbi-i-gPqbzkyQ4&ved=0ahUKEwjU2NSn2s-SAxU43wIHHSkeOekQ4dUDCBE&uact=5&oq=Gefyra+restaurant+lixouri&gs_lp=Egxnd3Mtd2l6LXNlcnAiGUdlZnlyYSByZXN0YXVyYW50IGxpeG91cmkyBRAhGKABSLA6UPAIWMA4cAN4AZABAJgB-wGgAfsgqgEGMC4yMy4yuAEDyAEA-AEBmAIcoALWIcICChAAGLADGNYEGEfCAgsQABiABBixAxiDAcICERAuGIAEGLEDGNEDGIMBGMcBwgILEC4YgAQYsQMYgwHCAggQABiABBixA8ICEBAAGIAEGLEDGIMBGIoFGArCAgsQLhiABBjRAxjHAcICBRAAGIAEwgIREC4YgAQYxwEYmAUYmQUYrwHCAgcQABiABBgKwgILEC4YgAQYxwEYrwHCAgkQABiABBgKGAvCAgYQABgWGB7CAgcQABiABBgNwgIGEAAYDRgewgIIEAAYFhgKGB7CAgcQIRigARgKwgIFECEYnwWYAwCIBgGQBgiSBwYzLjIzLjKgB5-jAbIHBjAuMjMuMrgHzSHCBwYzLjIzLjLIBzyACAA&sclient=gws-wiz-serp",
+  "rest_mparaka.jpg": "https://www.google.com/search?q=MOaraka+lixouri+&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n5pGDs-sYtuSBfwMcFC6yUT5QQcNg%3A1770753374992&ei=Xo2LabmZPNqQi-gPtKrN8Qo&ved=0ahUKEwi5wJqv2s-SAxVayAIHHTRVM64Q4dUDCBE&uact=5&oq=MOaraka+lixouri+&gs_lp=Egxnd3Mtd2l6LXNlcnAiEE1PYXJha2EgbGl4b3VyaSAyBhAAGA0YHjIIEAAYgAQYogQyCBAAGKIEGIkFMggQABiiBBiJBTIIEAAYgAQYogQyCBAAGIAEGKIESOAqUL8HWI8pcAN4AZABAZgBmAKgAYoXqgEGMC4xMy4zuAEDyAEA-AEBmAISoAK4FcICChAAGLADGNYEGEfCAgoQABiABBhDGIoFwgILEAAYgAQYsQMYgwHCAgsQLhiABBjRAxjHAcICCBAAGIAEGLEDwgIREC4YgAQYsQMY0QMYgwEYxwHCAgUQABiABMICIBAuGIAEGLEDGNEDGIMBGMcBGJcFGNwEGN4EGOAE2AEBwgIIEC4YgAQYsQPCAgsQLhiABBixAxiDAcICBRAuGIAEwgIXEC4YgAQYsQMYlwUY3AQY3gQY4ATYAQHCAg4QLhiABBjHARiYBRivAcICBxAuGIAEGArCAgcQABiABBgKwgIKEC4YgAQYQxiKBcICDxAuGIAEGMcBGAoYCxivAcICCRAAGIAEGAoYC8ICEhAuGIAEGMcBGAoYCxiOBRivAcICHhAuGIAEGMcBGAoYCxivARiXBRjcBBjeBBjgBNgBAcICDRAuGIAEGLEDGIMBGA3CAgcQABiABBgNwgINEC4YgAQYxwEYDRivAcICEBAuGIAEGMcBGA0YjgUYrwHCAgcQLhiABBgNwgIcEC4YgAQYsQMYgwEYDRiXBRjcBBjeBBjgBNgBAcICHxAuGIAEGMcBGA0YjgUYrwEYlwUY3AQY3gQY4ATYAQHCAgUQABjvBcICCRAhGKABGAoYKsICBxAhGKABGAqYAwCIBgGQBgi6BgYIARABGBSSBwYzLjEyLjOgB_mlAbIHBjAuMTIuM7gHrRXCBwYwLjExLjfIBzCACAA&sclient=gws-wiz-serp",
+  "rest_tsilikos.jpg": "https://www.google.com/search?q=Tsilikos+lixouri&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n57pBoXg48sVLYsyqrbZFSNVc1Rdw%3A1770753388678&ei=bI2LacaIKYnui-gPrceOMQ&ved=0ahUKEwjG7t212s-SAxUJ9wIHHa2jIwYQ4dUDCBE&uact=5&oq=Tsilikos+lixouri&gs_lp=Egxnd3Mtd2l6LXNlcnAiEFRzaWxpa29zIGxpeG91cmkyCBAAGIAEGKIEMggQABiABBiiBDIIEAAYgAQYogQyCBAAGIAEGKIEMgUQABjvBUjyEFC3BliVEHACeAGQAQCYAZgBoAGDCKoBAzAuN7gBA8gBAPgBAZgCBqAC2ATCAgoQABiwAxjWBBhHwgIGEAAYBxgemAMAiAYBkAYHkgcDMi40oAeVIbIHAzAuNLgH0wTCBwMwLjbIBwuACAA&sclient=gws-wiz-serp",
+  "skala.jpg": "https://www.google.com/search?q=Skala+Kefalonia&sca_esv=3ef4ee282b12278c&biw=1536&bih=756&sxsrf=ANbL-n5SjUMOOcx-oEqp0MMri2k6qirR1Q%3A1770753293441&ei=DY2LafTZGo2ni-gPjuPPmAU&ved=0ahUKEwi0lKmI2s-SAxWN0wIHHY7xE1MQ4dUDCBE&uact=5&oq=Skala+Kefalonia&gs_lp=Egxnd3Mtd2l6LXNlcnAiD1NrYWxhIEtlZmFsb25pYTIFEC4YgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDICECYyBhAAGBYYHjIGEAAYFhgeMgYQABgWGB4yFBAuGIAEGJcFGNwEGN4EGOAE2AEBSKAVUOUCWPITcAB4ApABApgBmASgAf8cqgELMC41LjUuMy4wLjG4AQPIAQD4AQGYAgqgAtMPwgIEEAAYR8ICERAuGIAEGMcBGJgFGJkFGK8BwgILEC4YgAQYxwEYrwHCAiAQLhiABBjHARiYBRiZBRivARiXBRjcBBjeBBjgBNgBAcICCRAAGIAEGAoYC5gDAIgGAZAGCLoGBggBEAEYFJIHBzEuNC40LjGgB-acAbIHBzAuNC40LjG4B88PwgcFMC4xLjnIBySACAA&sclient=gws-wiz-serp"
+};
+
+
+/* Make any image whose filename exists in PHOTO_LINKS clickable */
+function __basenameFromSrc(src){
+  try {
+    const clean = String(src || "").split("#")[0].split("?")[0];
+    return clean.substring(clean.lastIndexOf("/") + 1);
+  } catch(e) { return ""; }
+}
+
+function __getCurrentState(){
+  const activeScreen = Object.entries(screens).find(([k,el]) => el.classList.contains("active"))?.[0] || "splash";
+  const state = {
+    screen: activeScreen,
+    pageKey: (activeScreen === "page" ? (window.currentPageKey || null) : null),
+    localTab: null,
+    cardScrollTop: null
+  };
+  if(activeScreen === "page") {
+    const activeTab = pageCard?.querySelector?.(".tabPill.active");
+    if(activeTab) state.localTab = activeTab.dataset.localTab || null;
+    if(pageCard) state.cardScrollTop = pageCard.scrollTop || 0;
+  }
+  return state;
+}
+
+function __persistState(state){
+  try { localStorage.setItem("seashell_state_v1", JSON.stringify(state)); } catch(e) {
+    try { sessionStorage.setItem("seashell_state_v1", JSON.stringify(state)); } catch(e2) {}
+  }
+}
+
+function __restoreState(){
+  // Restore last screen safely. If the saved state is invalid/corrupted, ignore it.
+  const validate = (state) => {
+    if(!state || typeof state !== "object") return null;
+    const allowed = new Set(["splash","welcome","menu","page"]);
+    if(!allowed.has(state.screen)) return null;
+    if(state.screen === "page"){
+      if(!state.pageKey || !PAGES || !PAGES[state.pageKey]) return null;
+    }
+    return state;
+  };
+
+  try {
+    const raw = localStorage.getItem("seashell_state_v1");
+    if(raw) return validate(JSON.parse(raw));
+  } catch(e) {}
+  try {
+    const raw2 = sessionStorage.getItem("seashell_state_v1");
+    return raw2 ? validate(JSON.parse(raw2)) : null;
+  } catch(e2) { return null; }
+}
+
+function __applyState(state){
+  if(!state || !state.screen) return;
+  if(state.screen === "page" && state.pageKey) {
+    // render correct page then show it
+    renderPage(state.pageKey);
+    show("page");
+    // restore local tab if exists
+    if(state.localTab) {
+      const btn = pageTopTitle?.querySelector?.(`[data-local-tab="${state.localTab}"]`);
+      if(btn) btn.click();
+    }
+    // restore scroll
+    if(typeof state.cardScrollTop === "number") {
+      requestAnimationFrame(() => { if(pageCard) pageCard.scrollTop = state.cardScrollTop; });
+    }
+  } else {
+    show(state.screen);
+  }
+}
+
+function __attachPhotoLinks(root){
+  if(!root) return;
+  const imgs = root.querySelectorAll("img");
+  imgs.forEach(img => {
+    const fname = __basenameFromSrc(img.getAttribute("src") || img.src || "");
+    const href = PHOTO_LINKS[fname];
+    if(!href) return;
+
+    if(img.dataset.linked === "1") return;
+    img.dataset.linked = "1";
+    img.classList.add("clickablePhoto");
+    img.setAttribute("role","link");
+    img.setAttribute("tabindex","0");
+    img.setAttribute("aria-label", (img.getAttribute("alt") || fname) + " (open link)");
+
+    const go = (ev) => {
+      try { ev?.stopPropagation?.(); ev?.preventDefault?.(); } catch(e) {}
+      __persistState(__getCurrentState());
+      // open in same tab so user can press browser back; state is restored from sessionStorage
+      window.location.href = href;
+    };
+    img.addEventListener("click", go);
+    img.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" || e.key === " ") go(e);
+    });
+  });
+}
+
+/* Patch renderPage to attach links after every render */
+const __orig_renderPage = renderPage;
+renderPage = function(key){
+  __orig_renderPage(key);
+  // attach links after DOM updates
+  requestAnimationFrame(() => __attachPhotoLinks(pageCard));
+};
+
+/* Patch show() to keep browser history + persist state */
+const __orig_show = show;
+let __suppressHistory = false;
+
+show = function(screenId){
+  __orig_show(screenId);
+
+  if(__suppressHistory) return;
+  const state = __getCurrentState();
+  __persistState(state);
+
+  // push/replace history state so browser back works inside the app too
+  const urlHash = (state.screen === "page" && state.pageKey) ? ("#/" + encodeURIComponent(state.pageKey)) : ("#/" + encodeURIComponent(state.screen));
+  try {
+    // avoid pushing duplicates
+    const cur = history.state;
+    const same = cur && JSON.stringify(cur) === JSON.stringify(state);
+    if(!same) history.pushState(state, "", urlHash);
+  } catch(e) {}
+};
+
+/* Ensure initial history state + restore last view (after coming back from external site) */
+(function __historyInit(){
+  const restored = __restoreState();
+  if(restored) {
+    // don't double-push when applying restored state
+    __suppressHistory = true;
+    __applyState(restored);
+    __suppressHistory = false;
+    try { history.replaceState(__getCurrentState(), "", location.hash || "#/"); } catch(e) {}
+  } else {
+    try { history.replaceState({screen:"welcome"}, "", "#/welcome"); } catch(e) {}
+  }
+
+  // react to browser back/forward
+  window.addEventListener("popstate", (e) => {
+    const state = e.state || __restoreState();
+    __suppressHistory = true;
+    if(state) __applyState(state);
+    else show("welcome");
+    __suppressHistory = false;
+  });
+
+
+  // On iOS/Safari, sessionStorage can be cleared when navigating to another site.
+  // pageshow fires when returning via Back (including bfcache). Re-apply the last saved state.
+  let __didPageShowRestore = false;
+  window.addEventListener("pageshow", () => {
+    if(__didPageShowRestore) return;
+    const st = __restoreState();
+    if(st){
+      __suppressHistory = true;
+      __applyState(st);
+      __suppressHistory = false;
+      __didPageShowRestore = true;
+    }
+  });
+
+  // Save state when page is being hidden (navigation away / app background)
+  document.addEventListener("visibilitychange", () => {
+    if(document.hidden){
+      __persistState(__getCurrentState());
+    }
+  });
+
+  // also attach links on first render (splash/home)
+  requestAnimationFrame(() => __attachPhotoLinks(document));
+})();
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  if(!location.hash || location.hash === "#/" || location.hash === "#"){
+    location.hash = "#/welcome";
+  }
+});
 
 </script>
 </body>
